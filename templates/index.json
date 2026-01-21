@@ -1,0 +1,289 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "blocks": {
+        "heading_YhknLa": {
+          "type": "heading",
+          "settings": {
+            "heading": "Welcome to the Weird Side",
+            "heading_size": "h0"
+          }
+        },
+        "text_V49jAW": {
+          "type": "text",
+          "settings": {
+            "text": "Enchanting handmade creations with a spooky twist. For those who wear black in July and know that spooky doesn't need a season.",
+            "text_style": "subtitle"
+          }
+        },
+        "buttons_3CzemK": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Shop the Collection",
+            "button_link_1": "shopify://collections/all",
+            "button_style_secondary_1": false,
+            "button_label_2": "About the Maker",
+            "button_link_2": "shopify://pages/contact",
+            "button_style_secondary_2": true
+          }
+        }
+      },
+      "block_order": ["heading_YhknLa", "text_V49jAW", "buttons_3CzemK"],
+      "settings": {
+        "image": "shopify://shop_images/il_1000x794.7550340685_524s.jpg",
+        "image_2": "shopify://shop_images/il_1000x794.6810776601_dz0e.jpg",
+        "image_overlay_opacity": 50,
+        "image_height": "large",
+        "image_behavior": "none",
+        "desktop_content_position": "middle-center",
+        "desktop_content_alignment": "center",
+        "show_text_box": false,
+        "color_scheme": "scheme-purple-accent",
+        "stack_images_on_mobile": true,
+        "mobile_content_alignment": "center",
+        "show_text_below": false
+      }
+    },
+    "value_props": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_1": {
+          "type": "column",
+          "settings": {
+            "title": "Handmade with Heart",
+            "text": "<p>Every piece is crafted with love and a little bit of magic. No mass production here - just unique creations made especially for you.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_2": {
+          "type": "column",
+          "settings": {
+            "title": "Fully Customizable",
+            "text": "<p>Your weird is worth celebrating! Personalize any item with your photos, names, or custom designs to make it uniquely yours.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_3": {
+          "type": "column",
+          "settings": {
+            "title": "Spooky Year-Round",
+            "text": "<p>October is forever here. Our creations embrace the dark, the whimsical, and everything in between - perfect for those who decorate with bones.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": ["column_1", "column_2", "column_3"],
+      "settings": {
+        "title": "",
+        "heading_size": "h2",
+        "image_width": "third",
+        "image_ratio": "adapt",
+        "button_label": "",
+        "button_link": "",
+        "columns_desktop": 3,
+        "column_alignment": "center",
+        "background_style": "primary",
+        "color_scheme": "scheme-dark-main",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "all-products",
+        "products_to_show": 8,
+        "title": "Creepy Curiosities",
+        "heading_size": "h1",
+        "description": "<p>Explore our most enchanting handmade treasures</p>",
+        "show_description": true,
+        "description_style": "subtitle",
+        "columns_desktop": 4,
+        "enable_desktop_slider": true,
+        "full_width": false,
+        "show_view_all": true,
+        "view_all_style": "solid",
+        "color_scheme": "scheme-dark-card",
+        "image_ratio": "portrait",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "standard",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "about_us": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_tdAAEF": {
+          "type": "heading",
+          "settings": {
+            "heading": "Meet the Midnight Muse",
+            "heading_size": "h1"
+          }
+        },
+        "text_NVRfWA": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Welcome to MidnightMuseMade - your one-stop-shop for all things cute, creepy, and completely you.</p><p>Whether it's a dog tag for your familiar, a tumbler that says \"don't summon me before coffee,\" or earrings that whisper \"October is forever\" - everything here is made with a little edge and a lot of heart.</p><p>For those who wear black in July, decorate with bones year-round, and know that spooky doesn't need a season - you're in the right place.</p><p><strong>Stay strange. Stay spooky. And thanks for creeping by.</strong></p>",
+            "text_style": "body"
+          }
+        },
+        "button_4C8gRf": {
+          "type": "button",
+          "settings": {
+            "button_label": "Get in Touch",
+            "button_link": "shopify://pages/contact",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": ["heading_tdAAEF", "text_NVRfWA", "button_4C8gRf"],
+      "settings": {
+        "image": "shopify://shop_images/a5c96f05-il_fullxfull.7434455652_7p0p.jpg",
+        "height": "adapt",
+        "desktop_image_width": "medium",
+        "layout": "image_first",
+        "image_behavior": "none",
+        "content_layout": "no-overlap",
+        "desktop_content_position": "middle",
+        "desktop_content_alignment": "left",
+        "mobile_content_alignment": "left",
+        "section_color_scheme": "scheme-purple-accent",
+        "color_scheme": "scheme-purple-accent",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "collection_banner": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Perfect for Pet Parents & Weirdos Alike"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From custom pet tags for your familiar to spooky accessories for yourself - we've got your weird covered.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "Browse All Products",
+            "button_link": "shopify://collections/all",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": ["heading", "text", "button"],
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-burgundy",
+        "full_width": true,
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "testimonial": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_nbGaNa": {
+          "type": "column",
+          "settings": {
+            "title": "\"These turned out perfectly!\"",
+            "text": "<p>The customer service and communication was outstanding. It exceeded my expectations!</p><p><em>- Jamie</em></p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_JtHCLR": {
+          "type": "column",
+          "settings": {
+            "title": "\"The perfect Christmas keepsake!\"",
+            "text": "<p>I love how I could customize the photo and the lettering, it's just fantastic and will hang on our tree for years to come.</p><p><em>- Mallory</em></p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_LqE6jB": {
+          "type": "column",
+          "settings": {
+            "title": "\"A gift to be treasured!\"",
+            "text": "<p>Love my custom ornament. The custom design and photo are very well done. This is a gift that will be treasured for a lifetime!</p><p><em>- Jane</em></p>",
+            "link_label": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": ["column_nbGaNa", "column_JtHCLR", "column_LqE6jB"],
+      "settings": {
+        "title": "What Our Weirdos Say",
+        "heading_size": "h1",
+        "image_width": "full",
+        "image_ratio": "adapt",
+        "button_label": "",
+        "button_link": "",
+        "columns_desktop": 3,
+        "column_alignment": "center",
+        "background_style": "primary",
+        "color_scheme": "scheme-dark-card",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Join the Coven"
+          }
+        },
+        "paragraph": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Subscribe for exclusive deals, new product drops, and a sprinkle of dark magic in your inbox.</p>"
+          }
+        },
+        "email_form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": ["heading", "paragraph", "email_form"],
+      "settings": {
+        "color_scheme": "scheme-purple-accent",
+        "full_width": true,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "value_props",
+    "featured_collection",
+    "about_us",
+    "collection_banner",
+    "testimonial",
+    "newsletter"
+  ]
+}

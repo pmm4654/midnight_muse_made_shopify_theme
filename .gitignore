@@ -1,0 +1,22 @@
+# Shopify theme settings (store-specific, changes frequently)
+config/settings_data.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Shopify CLI
+.shopify/
+
+# If you add any build tools later
+node_modules/
+.env
+.env.local
+
+.playwright-mcp/
