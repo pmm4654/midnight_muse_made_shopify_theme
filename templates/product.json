@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -24,6 +33,10 @@
             "picker_type": "button",
             "swatch_shape": "circle"
           }
+        },
+        "uploadery_app_block_GFhTGm": {
+          "type": "shopify://apps/uploadery/blocks/app-block/5253cb5d-9d0f-47bd-a1aa-51cb83bf6de3",
+          "settings": {}
         },
         "quantity_selector": {
           "type": "quantity_selector",
@@ -52,6 +65,7 @@
         "title",
         "price",
         "variant_picker",
+        "uploadery_app_block_GFhTGm",
         "quantity_selector",
         "buy_buttons",
         "description",
@@ -92,5 +106,8 @@
       }
     }
   },
-  "order": ["main", "related-products"]
+  "order": [
+    "main",
+    "related-products"
+  ]
 }
