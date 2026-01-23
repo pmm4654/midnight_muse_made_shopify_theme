@@ -34,6 +34,10 @@
             "swatch_shape": "circle"
           }
         },
+        "uploadery_app_block_GFhTGm": {
+          "type": "shopify://apps/uploadery/blocks/app-block/5253cb5d-9d0f-47bd-a1aa-51cb83bf6de3",
+          "settings": {}
+        },
         "quantity_selector": {
           "type": "quantity_selector",
           "settings": {}
@@ -61,6 +65,7 @@
         "title",
         "price",
         "variant_picker",
+        "uploadery_app_block_GFhTGm",
         "quantity_selector",
         "buy_buttons",
         "description",
