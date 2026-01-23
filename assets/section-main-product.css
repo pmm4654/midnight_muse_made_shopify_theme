@@ -367,6 +367,16 @@ a.product__text {
   max-width: 44rem;
 }
 
+.product-form__custom-fields {
+  max-width: 44rem;
+  margin-bottom: 1.5rem;
+}
+
+.product-form__custom-fields .field__label span[aria-hidden] {
+  color: rgb(var(--color-foreground));
+  margin-left: 0.2rem;
+}
+
 .product--no-media .product__info-container > modal-opener {
   display: block;
   text-align: center;

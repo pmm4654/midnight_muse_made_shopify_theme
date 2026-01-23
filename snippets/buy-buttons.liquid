@@ -60,6 +60,26 @@
           {%- render 'gift-card-recipient-form', product: product, form: form, section: section -%}
         {%- endif -%}
 
+        {%- if product.metafields.custom.required_fields -%}
+          <div class="product-form__custom-fields">
+            {%- for field in product.metafields.custom.required_fields.value -%}
+              <div class="field">
+                <input
+                  class="field__input"
+                  type="text"
+                  id="{{ field | handleize }}-{{ section_id }}"
+                  name="properties[{{ field }}]"
+                  required
+                >
+                <label class="field__label" for="{{ field | handleize }}-{{ section_id }}">
+                  {{ field }}
+                  <span aria-hidden="true">*</span>
+                </label>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
         <div class="product-form__buttons">
           {%- liquid
             assign check_against_inventory = true

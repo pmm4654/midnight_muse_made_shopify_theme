@@ -21,6 +21,16 @@ if (!customElements.get('product-form')) {
         evt.preventDefault();
         if (this.submitButton.getAttribute('aria-disabled') === 'true') return;
 
+        // Validate required fields
+        const requiredFields = this.form.querySelectorAll('[required]');
+        for (const field of requiredFields) {
+          if (!field.value.trim()) {
+            field.focus();
+            this.handleErrorMessage(window.variantStrings?.requiredField || 'Please fill in all required fields');
+            return;
+          }
+        }
+
         this.handleErrorMessage();
 
         this.submitButton.setAttribute('aria-disabled', true);
