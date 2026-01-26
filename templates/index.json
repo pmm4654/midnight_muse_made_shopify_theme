@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
@@ -29,7 +38,11 @@
           }
         }
       },
-      "block_order": ["heading_YhknLa", "text_V49jAW", "buttons_3CzemK"],
+      "block_order": [
+        "heading_YhknLa",
+        "text_V49jAW",
+        "buttons_3CzemK"
+      ],
       "settings": {
         "image": "shopify://shop_images/il_1000x794.7550340685_524s.jpg",
         "image_2": "shopify://shop_images/il_1000x794.6810776601_dz0e.jpg",
@@ -76,7 +89,11 @@
           }
         }
       },
-      "block_order": ["column_1", "column_2", "column_3"],
+      "block_order": [
+        "column_1",
+        "column_2",
+        "column_3"
+      ],
       "settings": {
         "title": "",
         "heading_size": "h2",
@@ -97,9 +114,9 @@
     "featured_collection": {
       "type": "featured-collection",
       "settings": {
-        "collection": "all-products",
-        "products_to_show": 8,
-        "title": "Creepy Curiosities",
+        "collection": "featured-products",
+        "products_to_show": 5,
+        "title": "Featured Products",
         "heading_size": "h1",
         "description": "<p>Explore our most enchanting handmade treasures</p>",
         "show_description": true,
@@ -148,7 +165,11 @@
           }
         }
       },
-      "block_order": ["heading_tdAAEF", "text_NVRfWA", "button_4C8gRf"],
+      "block_order": [
+        "heading_tdAAEF",
+        "text_NVRfWA",
+        "button_4C8gRf"
+      ],
       "settings": {
         "image": "shopify://shop_images/a5c96f05-il_fullxfull.7434455652_7p0p.jpg",
         "height": "adapt",
@@ -171,7 +192,8 @@
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "Perfect for Pet Parents & Weirdos Alike"
+            "heading": "Perfect for Pet Parents & Weirdos Alike",
+            "heading_size": "h1"
           }
         },
         "text": {
@@ -185,11 +207,18 @@
           "settings": {
             "button_label": "Browse All Products",
             "button_link": "shopify://collections/all",
-            "button_style_secondary": false
+            "button_style_secondary": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
           }
         }
       },
-      "block_order": ["heading", "text", "button"],
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ],
       "settings": {
         "desktop_content_position": "center",
         "content_alignment": "center",
@@ -230,7 +259,11 @@
           }
         }
       },
-      "block_order": ["column_nbGaNa", "column_JtHCLR", "column_LqE6jB"],
+      "block_order": [
+        "column_nbGaNa",
+        "column_JtHCLR",
+        "column_LqE6jB"
+      ],
       "settings": {
         "title": "What Our Weirdos Say",
         "heading_size": "h1",
@@ -254,7 +287,8 @@
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "Join the Coven"
+            "heading": "Join the Coven",
+            "heading_size": "h1"
           }
         },
         "paragraph": {
@@ -268,7 +302,11 @@
           "settings": {}
         }
       },
-      "block_order": ["heading", "paragraph", "email_form"],
+      "block_order": [
+        "heading",
+        "paragraph",
+        "email_form"
+      ],
       "settings": {
         "color_scheme": "scheme-purple-accent",
         "full_width": true,
