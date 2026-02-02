@@ -59,6 +59,15 @@
       >
         {%- if card_product.featured_media -%}
           <div class="card__media{% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ settings.card_color_scheme }} gradient{% endif %}">
+            {%- if card_product.tags contains 'requires-customization' -%}
+              <span class="badge badge--customizable" aria-label="{{ 'products.product.customizable' | t }}">
+                <svg class="badge__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                <span>{{ 'products.product.customizable' | t }}</span>
+              </span>
+            {%- endif -%}
             <div class="media media--transparent media--hover-effect">
               {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
               <img
@@ -302,7 +311,11 @@
                 href="{{ card_product.url }}"
                 class="quick-add__submit button button--full-width button--secondary{% if horizontal_quick_add %} card--horizontal__quick-add animate-arrow{% endif %}"
               >
-                {{ 'products.product.choose_options' | t }}
+                {%- if settings.customizable_product_cta != blank -%}
+                  {{ settings.customizable_product_cta }}
+                {%- else -%}
+                  {{ 'products.product.customize_now' | t }}
+                {%- endif -%}
                 {%- if horizontal_quick_add -%}
                   <span class="icon-wrap">
                     {{- 'icon-arrow.svg' | inline_asset_content -}}
@@ -407,7 +420,11 @@
                 href="{{ card_product.url }}"
                 class="quick-add__submit button button--full-width button--secondary"
               >
-                {{ 'products.product.choose_options' | t }}
+                {%- if settings.customizable_product_cta != blank -%}
+                  {{ settings.customizable_product_cta }}
+                {%- else -%}
+                  {{ 'products.product.customize_now' | t }}
+                {%- endif -%}
               </a>
             </div>
           {% elsif card_product.variants_count == 1 %}

@@ -117,6 +117,7 @@
     "product": {
       "add_to_cart": "Add to cart",
       "choose_options": "Choose options",
+      "customize_now": "Customize Now",
       "choose_product_options": "Choose options for {{ product_name }}",
       "description": "Description",
       "inventory_in_stock": "In stock",
@@ -178,6 +179,7 @@
       },
       "share": "Share this product",
       "sold_out": "Sold out",
+      "customizable": "Customize",
       "unavailable": "Unavailable",
       "vendor": "Vendor",
       "value_unavailable": "{{ option_value }} - Unavailable",
