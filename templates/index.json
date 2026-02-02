@@ -44,13 +44,12 @@
         "buttons_3CzemK"
       ],
       "settings": {
-        "image": "shopify://shop_images/il_1000x794.7550340685_524s.jpg",
-        "image_2": "shopify://shop_images/il_1000x794.6810776601_dz0e.jpg",
+        "image": "shopify://shop_images/ProductFlayLayHeaderImage.png",
         "image_overlay_opacity": 50,
         "image_height": "large",
         "image_behavior": "none",
-        "desktop_content_position": "middle-center",
-        "desktop_content_alignment": "center",
+        "desktop_content_position": "middle-left",
+        "desktop_content_alignment": "left",
         "show_text_box": false,
         "color_scheme": "scheme-purple-accent",
         "stack_images_on_mobile": true,
