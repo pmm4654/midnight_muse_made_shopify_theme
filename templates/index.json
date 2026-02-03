@@ -151,7 +151,7 @@
         "text_NVRfWA": {
           "type": "text",
           "settings": {
-            "text": "<p>Welcome to MidnightMuseMade - your one-stop-shop for all things cute, creepy, and completely you.</p><p>Whether it's a dog tag for your familiar, a tumbler that says \"don't summon me before coffee,\" or earrings that whisper \"October is forever\" - everything here is made with a little edge and a lot of heart.</p><p>For those who wear black in July, decorate with bones year-round, and know that spooky doesn't need a season - you're in the right place.</p><p><strong>Stay strange. Stay spooky. And thanks for creeping by.</strong></p>",
+            "text": "<p><strong>Handmade goods for soft hearts with spooky taste.</strong><br/><br/>I’m Lauren, and I make things for people who love a little darkness mixed with a lot of heart My style is dark, whimsical, slightly sarcastic, dog obsessed, and of course a little weird.</p><p>Most of my designs are born from the question, <em>“Would my goth bestie love this?”</em> I also love creating custom pieces, especially for animal lovers and gifts that feel personal, playful, and made to be treasured.</p><p>Everything is made in my studio for the ones who romanticize all things dark, believe spooky isn’t a season, it’s a personality, and especially if you have an obsession with your pet.</p><p>Thanks for creeping by — stay strange.</p>",
             "text_style": "body"
           }
         },
@@ -170,9 +170,9 @@
         "button_4C8gRf"
       ],
       "settings": {
-        "image": "shopify://shop_images/a5c96f05-il_fullxfull.7434455652_7p0p.jpg",
+        "image": "shopify://shop_images/IMG_0056.jpg",
         "height": "adapt",
-        "desktop_image_width": "medium",
+        "desktop_image_width": "small",
         "layout": "image_first",
         "image_behavior": "none",
         "content_layout": "no-overlap",
