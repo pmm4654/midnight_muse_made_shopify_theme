@@ -45,8 +45,8 @@
       ],
       "settings": {
         "image": "shopify://shop_images/ProductFlayLayHeaderImageFull3.png",
-        "image_overlay_opacity": 60,
-        "image_height": "medium",
+        "image_overlay_opacity": 70,
+        "image_height": "small",
         "image_behavior": "none",
         "desktop_content_position": "middle-center",
         "desktop_content_alignment": "center",
@@ -55,6 +55,34 @@
         "stack_images_on_mobile": true,
         "mobile_content_alignment": "center",
         "show_text_below": false
+      }
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "featured-products",
+        "products_to_show": 5,
+        "title": "Featured Products",
+        "heading_size": "h1",
+        "description": "<p>Explore our most enchanting handmade treasures</p>",
+        "show_description": true,
+        "description_style": "subtitle",
+        "columns_desktop": 4,
+        "enable_desktop_slider": true,
+        "full_width": false,
+        "show_view_all": true,
+        "view_all_style": "solid",
+        "color_scheme": "inverse",
+        "image_ratio": "portrait",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "standard",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "padding_top": 80,
+        "padding_bottom": 80
       }
     },
     "value_props": {
@@ -73,7 +101,7 @@
           "type": "column",
           "settings": {
             "title": "Fully Customizable",
-            "text": "<p>Your weird is worth celebrating! Personalize any item with your photos, names, or custom designs to make it uniquely yours.</p>",
+            "text": "<p>Personalize any item with your photos, names, or custom designs to make it uniquely yours or a thoughtful gift.</p>",
             "link_label": "",
             "link": ""
           }
@@ -82,7 +110,7 @@
           "type": "column",
           "settings": {
             "title": "Spooky Year-Round",
-            "text": "<p>October is forever here. Our creations embrace the dark, the whimsical, and everything in between - perfect for those who decorate with bones.</p>",
+            "text": "<p>October is forever here. Our creations embrace the dark, the whimsical, and everything in between - perfect for those who love things a little dark.</p>",
             "link_label": "",
             "link": ""
           }
@@ -110,95 +138,20 @@
         "padding_bottom": 60
       }
     },
-    "featured_collection": {
-      "type": "featured-collection",
-      "settings": {
-        "collection": "featured-products",
-        "products_to_show": 5,
-        "title": "Featured Products",
-        "heading_size": "h1",
-        "description": "<p>Explore our most enchanting handmade treasures</p>",
-        "show_description": true,
-        "description_style": "subtitle",
-        "columns_desktop": 4,
-        "enable_desktop_slider": true,
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "color_scheme": "scheme-dark-card",
-        "image_ratio": "portrait",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "standard",
-        "columns_mobile": "2",
-        "swipe_on_mobile": true,
-        "padding_top": 80,
-        "padding_bottom": 80
-      }
-    },
-    "about_us": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_tdAAEF": {
-          "type": "heading",
-          "settings": {
-            "heading": "Meet the Midnight Muse",
-            "heading_size": "h1"
-          }
-        },
-        "text_NVRfWA": {
-          "type": "text",
-          "settings": {
-            "text": "<p><strong>Handmade goods for soft hearts with spooky taste.</strong><br/><br/>I’m Lauren, and I make things for people who love a little darkness mixed with a lot of heart My style is dark, whimsical, slightly sarcastic, dog obsessed, and of course a little weird.</p><p>Most of my designs are born from the question, <em>“Would my goth bestie love this?”</em> I also love creating custom pieces, especially for animal lovers and gifts that feel personal, playful, and made to be treasured.</p><p>Everything is made in my studio for the ones who romanticize all things dark, believe spooky isn’t a season, it’s a personality, and especially if you have an obsession with your pet.</p><p>Thanks for creeping by — stay strange.</p>",
-            "text_style": "body"
-          }
-        },
-        "button_4C8gRf": {
-          "type": "button",
-          "settings": {
-            "button_label": "Get in Touch",
-            "button_link": "shopify://pages/contact",
-            "button_style_secondary": false
-          }
-        }
-      },
-      "block_order": [
-        "heading_tdAAEF",
-        "text_NVRfWA",
-        "button_4C8gRf"
-      ],
-      "settings": {
-        "image": "shopify://shop_images/IMG_0056.jpg",
-        "height": "adapt",
-        "desktop_image_width": "small",
-        "layout": "image_first",
-        "image_behavior": "none",
-        "content_layout": "no-overlap",
-        "desktop_content_position": "middle",
-        "desktop_content_alignment": "left",
-        "mobile_content_alignment": "left",
-        "section_color_scheme": "scheme-purple-accent",
-        "color_scheme": "scheme-purple-accent",
-        "padding_top": 80,
-        "padding_bottom": 80
-      }
-    },
     "collection_banner": {
       "type": "rich-text",
       "blocks": {
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "Perfect for Pet Parents & Weirdos Alike",
+            "heading": "Made for You & Your Everyday Magic",
             "heading_size": "h1"
           }
         },
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>From custom pet car air fresheners for your familiar to spooky accessories for yourself - we've got your weird covered.</p>"
+            "text": "<p>Personalized pieces, everyday accessories, and just the right amount of spooky. Items made for you, your pets, and the people you love.</p>"
           }
         },
         "button": {
@@ -264,7 +217,7 @@
         "column_LqE6jB"
       ],
       "settings": {
-        "title": "What Our Weirdos Say",
+        "title": "Kind Words from Kind Humans",
         "heading_size": "h1",
         "image_width": "full",
         "image_ratio": "adapt",
@@ -273,7 +226,7 @@
         "columns_desktop": 3,
         "column_alignment": "center",
         "background_style": "primary",
-        "color_scheme": "scheme-dark-card",
+        "color_scheme": "scheme-dark-main",
         "columns_mobile": "1",
         "swipe_on_mobile": true,
         "padding_top": 80,
@@ -316,9 +269,8 @@
   },
   "order": [
     "hero",
-    "value_props",
     "featured_collection",
-    "about_us",
+    "value_props",
     "collection_banner",
     "testimonial",
     "newsletter"

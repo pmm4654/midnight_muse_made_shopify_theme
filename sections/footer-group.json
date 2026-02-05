@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "name": "t:sections.footer.name",
   "type": "footer",
@@ -16,18 +25,22 @@
           "type": "text",
           "settings": {
             "heading": "About the Maker",
-            "subtext": "<p>Handmade creations with a spooky twist - for weirdos & wagging tails. Every piece crafted with love and a little dark magic.</p>"
+            "subtext": "<p>Handmade creations with a spooky twist - for weirdos or wagging tails. Every piece crafted with love and a little dark magic.</p>"
           }
         },
         "text_contact": {
           "type": "text",
           "settings": {
             "heading": "Stay Connected",
-            "subtext": "<p>Follow us on social media for new products, behind-the-scenes content, and spooky inspiration.</p>"
+            "subtext": "<p>Follow us on social media for new products, behind-the-scenes content, and more.</p>"
           }
         }
       },
-      "block_order": ["link_list_7Xz637", "text_brand", "text_contact"],
+      "block_order": [
+        "link_list_7Xz637",
+        "text_brand",
+        "text_contact"
+      ],
       "custom_css": [],
       "settings": {
         "color_scheme": "scheme-dark-main",
@@ -45,5 +58,7 @@
       }
     }
   },
-  "order": ["footer"]
+  "order": [
+    "footer"
+  ]
 }

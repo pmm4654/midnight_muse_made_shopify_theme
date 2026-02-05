@@ -1,1 +1,82 @@
-{"sections":{"main":{"type":"main-page","settings":{"padding_top":36,"padding_bottom":36}},"form":{"type":"contact-form","settings":{"heading":"","heading_size":"h1","color_scheme":"background-2","padding_top":36,"padding_bottom":36}}},"order":["main","form"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "image_with_text_V3RBHb": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_CDtNpb": {
+          "type": "heading",
+          "settings": {
+            "heading": "Meet the Midnight Muse",
+            "heading_size": "h1"
+          }
+        },
+        "text_FeyHkE": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Handmade goods for soft hearts with spooky taste.</strong><br/><br/>I’m Lauren, and I make things for people who love a little darkness mixed with a lot of heart My style is dark, whimsical, slightly sarcastic, dog obsessed, and of course a little weird.</p><p>Most of my designs are born from the question, <em>“Would my goth bestie love this?”</em> I also love creating custom pieces, especially for animal lovers and gifts that feel personal, playful, and made to be treasured.</p><p>Everything is made in my studio for the ones who romanticize all things dark, believe spooky isn’t a season, it’s a personality, and especially if you have an obsession with your pet.</p><p>Thanks for creeping by — stay strange.</p>",
+            "text_style": "body"
+          }
+        },
+        "button_nqiE6P": {
+          "type": "button",
+          "settings": {
+            "button_label": "Get in Touch",
+            "button_link": "shopify://pages/contact",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_CDtNpb",
+        "text_FeyHkE",
+        "button_nqiE6P"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/IMG_0056.jpg",
+        "height": "adapt",
+        "desktop_image_width": "small",
+        "layout": "image_first",
+        "image_behavior": "none",
+        "content_layout": "no-overlap",
+        "desktop_content_position": "middle",
+        "desktop_content_alignment": "left",
+        "mobile_content_alignment": "left",
+        "section_color_scheme": "scheme-purple-accent",
+        "color_scheme": "scheme-purple-accent",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "form": {
+      "type": "contact-form",
+      "settings": {
+        "heading": "",
+        "heading_size": "h1",
+        "color_scheme": "background-2",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "image_with_text_V3RBHb",
+    "main",
+    "form"
+  ]
+}
