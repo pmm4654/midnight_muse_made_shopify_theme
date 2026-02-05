@@ -17,7 +17,7 @@
         "announcement_1": {
           "type": "announcement",
           "settings": {
-            "text": "FREE SHIPPING on orders over $50 | Handmade with dark magic",
+            "text": "FREE SHIPPING on orders over $50",
             "link": ""
           }
         }
