@@ -44,7 +44,7 @@
         "buttons_3CzemK"
       ],
       "settings": {
-        "image": "shopify://shop_images/ProductFlayLayHeaderImageFull3.png",
+        "image": "shopify://shop_images/ProductFlayLayHeaderImage-Thinner.png",
         "image_overlay_opacity": 70,
         "image_height": "small",
         "image_behavior": "none",
