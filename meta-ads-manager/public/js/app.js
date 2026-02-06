@@ -1,8 +1,8 @@
 /**
  * Meta Ads Manager — Single Page Application
  *
- * Client-side router and page controllers for the setup wizard,
- * dashboard, AI assistant, campaigns, analytics, and settings.
+ * Client-side router and page controllers. All credentials are managed
+ * via environment variables; the UI never collects or stores secrets.
  */
 
 // ============================================================
@@ -20,35 +20,23 @@ async function api(method, path, body = null) {
 }
 
 // ============================================================
-// Simple markdown renderer (handles basics for AI responses)
+// Simple markdown renderer
 // ============================================================
 
 function renderMarkdown(text) {
-  let html = text
-    // Code blocks
-    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
-      return `<pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
-    })
-    // Inline code
+  return text
+    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
+      `<pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`)
     .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // Bold
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Italic
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Headers
     .replace(/^### (.+)$/gm, '<h4>$1</h4>')
     .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-    // Unordered lists
     .replace(/^- (.+)$/gm, '<li>$1</li>')
-    // Ordered lists
     .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-    // Wrap consecutive <li> in <ul>
     .replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
-    // Paragraphs (lines not already wrapped)
     .replace(/^(?!<[huploc])(.*\S.*)$/gm, '<p>$1</p>')
-    // Clean up extra newlines
     .replace(/\n{2,}/g, '\n');
-  return html;
 }
 
 function escapeHtml(str) {
@@ -77,13 +65,9 @@ function navigate() {
 
 window.addEventListener('hashchange', navigate);
 window.addEventListener('DOMContentLoaded', () => {
-  // Check if we have settings configured; if not, go to setup
   api('GET', '/settings').then((settings) => {
-    const hasMeta = settings.meta?.access_token === '***configured***';
-    const hasShopify = settings.shopify?.admin_token === '***configured***';
-    const hasClaude = settings.claude?.api_key === '***configured***';
-
-    if (!hasMeta && !hasShopify && !hasClaude && !window.location.hash) {
+    const allConfigured = settings.configured?.facebook && settings.configured?.shopify && settings.configured?.claude;
+    if (!allConfigured && !window.location.hash) {
       window.location.hash = '#/setup';
     }
     navigate();
@@ -95,18 +79,13 @@ window.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 
 function initSidebar(activeRoute) {
-  const sidebars = document.querySelectorAll('#sidebar');
-  sidebars.forEach((el) => {
+  document.querySelectorAll('#sidebar').forEach((el) => {
     const tmpl = document.getElementById('tmpl-sidebar');
     el.innerHTML = tmpl.innerHTML;
     el.querySelectorAll('.nav-item').forEach((item) => {
-      if (item.dataset.route === activeRoute) {
-        item.classList.add('active');
-      }
+      if (item.dataset.route === activeRoute) item.classList.add('active');
     });
   });
-
-  // Check connection status for sidebar
   checkSidebarStatus();
 }
 
@@ -117,7 +96,6 @@ async function checkSidebarStatus() {
       api('GET', '/shopify/test').catch(() => ({ connected: false })),
       api('GET', '/ai/test').catch(() => ({ connected: false })),
     ]);
-
     const allConnected = meta.connected && shopify.connected && claude.connected;
     const dot = document.getElementById('sidebar-status-dot');
     const text = document.getElementById('sidebar-status-text');
@@ -125,9 +103,23 @@ async function checkSidebarStatus() {
       dot.className = `status-dot ${allConnected ? 'connected' : 'pending'}`;
       text.textContent = allConnected ? 'All services connected' : 'Some services need setup';
     }
-  } catch (e) {
-    // Ignore
-  }
+  } catch (e) { /* ignore */ }
+}
+
+// ============================================================
+// Env-var status helper (shows which vars are set/missing)
+// ============================================================
+
+function renderEnvStatus(containerId, vars) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = vars.map(([name, isSet]) =>
+    `<div class="flex gap-1 mb-1" style="align-items:center;font-size:0.85rem;">
+      <span class="status-dot ${isSet ? 'connected' : 'disconnected'}"></span>
+      <code>${name}</code>
+      <span class="text-muted">${isSet ? 'set' : 'missing'}</span>
+    </div>`
+  ).join('');
 }
 
 // ============================================================
@@ -136,160 +128,107 @@ async function checkSidebarStatus() {
 
 function renderSetup() {
   const app = document.getElementById('app');
-  const tmpl = document.getElementById('tmpl-setup');
-  app.innerHTML = tmpl.innerHTML;
+  app.innerHTML = document.getElementById('tmpl-setup').innerHTML;
 
   let currentStep = 1;
   const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
   if (params.get('step')) currentStep = parseInt(params.get('step'));
 
-  // Handle OAuth callback token
-  if (params.get('token')) {
-    document.getElementById('meta-access-token').value = params.get('token');
+  // Check for OAuth callback token
+  const oauthToken = params.get('oauth_token');
+  if (oauthToken) {
+    const display = document.getElementById('oauth-token-display');
+    const value = document.getElementById('oauth-token-value');
+    if (display && value) {
+      display.classList.remove('hidden');
+      value.textContent = `FACEBOOK_ACCESS_TOKEN=${decodeURIComponent(oauthToken)}`;
+    }
   }
 
-  // Load existing settings
-  api('GET', '/settings').then((settings) => {
-    if (settings.meta?.app_id) document.getElementById('meta-app-id').value = settings.meta.app_id;
-    if (settings.meta?.ad_account_id) document.getElementById('meta-ad-account-id').value = settings.meta.ad_account_id;
-    if (settings.shopify?.store_domain) document.getElementById('shopify-domain').value = settings.shopify.store_domain;
+  // Load env var status
+  api('GET', '/settings').then((s) => {
+    renderEnvStatus('meta-env-status', [
+      ['FACEBOOK_APP_ID', s.facebook?.app_id],
+      ['FACEBOOK_APP_SECRET', s.facebook?.app_secret],
+      ['FACEBOOK_AD_ACCOUNT_ID', s.facebook?.ad_account_id],
+      ['FACEBOOK_ACCESS_TOKEN', s.facebook?.access_token],
+    ]);
+    renderEnvStatus('shopify-env-status', [
+      ['SHOPIFY_CLIENT_ID', s.shopify?.client_id],
+      ['SHOPIFY_API_KEY', s.shopify?.api_key],
+    ]);
+    renderEnvStatus('claude-env-status', [
+      ['ANTHROPIC_API_KEY', s.claude?.api_key],
+    ]);
   });
 
   updateWizardUI(currentStep);
 
-  // Meta OAuth button
-  document.getElementById('btn-meta-oauth').addEventListener('click', async () => {
-    const appId = document.getElementById('meta-app-id').value.trim();
-    const appSecret = document.getElementById('meta-app-secret').value.trim();
-    if (!appId || !appSecret) {
-      alert('Please enter your Meta App ID and App Secret first.');
-      return;
-    }
-    await api('POST', '/settings/meta', { app_id: appId, app_secret: appSecret });
+  // OAuth button — redirects to the server-side OAuth initiator
+  document.getElementById('btn-meta-oauth').addEventListener('click', () => {
     window.location.href = '/api/auth/meta/login';
   });
 
-  // Meta test button
+  // Test buttons
   document.getElementById('btn-meta-test').addEventListener('click', async () => {
-    const resultEl = document.getElementById('meta-test-result');
-    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Testing...</div>';
-
-    // Save settings first
-    await api('POST', '/settings/meta', {
-      app_id: document.getElementById('meta-app-id').value.trim(),
-      app_secret: document.getElementById('meta-app-secret').value.trim(),
-      ad_account_id: document.getElementById('meta-ad-account-id').value.trim(),
-      access_token: document.getElementById('meta-access-token').value.trim(),
-    });
-
-    const result = await api('GET', '/auth/meta/test');
-    if (result.connected) {
-      resultEl.innerHTML = `<div class="alert alert-success">Connected to ${result.account_name} (${result.account_id}) - ${result.currency}</div>`;
-    } else {
-      resultEl.innerHTML = `<div class="alert alert-danger">Connection failed: ${result.error}</div>`;
-    }
+    const el = document.getElementById('meta-test-result');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div> Testing...</div>';
+    const r = await api('GET', '/auth/meta/test');
+    el.innerHTML = r.connected
+      ? `<div class="alert alert-success">Connected to ${r.account_name} (${r.account_id}) - ${r.currency}</div>`
+      : `<div class="alert alert-danger">Failed: ${r.error}</div>`;
   });
 
-  // Shopify test button
   document.getElementById('btn-shopify-test').addEventListener('click', async () => {
-    const resultEl = document.getElementById('shopify-test-result');
-    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Testing...</div>';
-
-    await api('POST', '/settings/shopify', {
-      store_domain: document.getElementById('shopify-domain').value.trim(),
-      admin_token: document.getElementById('shopify-admin-token').value.trim(),
-    });
-
-    const result = await api('GET', '/shopify/test');
-    if (result.connected) {
-      resultEl.innerHTML = `<div class="alert alert-success">Connected to ${result.shop_name} (${result.domain})</div>`;
-    } else {
-      resultEl.innerHTML = `<div class="alert alert-danger">Connection failed: ${result.error}</div>`;
-    }
+    const el = document.getElementById('shopify-test-result');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div> Testing...</div>';
+    const r = await api('GET', '/shopify/test');
+    el.innerHTML = r.connected
+      ? `<div class="alert alert-success">Connected to ${r.shop_name} (${r.domain})</div>`
+      : `<div class="alert alert-danger">Failed: ${r.error}</div>`;
   });
 
-  // Claude test button
   document.getElementById('btn-claude-test').addEventListener('click', async () => {
-    const resultEl = document.getElementById('claude-test-result');
-    resultEl.innerHTML = '<div class="loading"><div class="spinner"></div> Testing...</div>';
-
-    await api('POST', '/settings/claude', {
-      api_key: document.getElementById('claude-api-key').value.trim(),
-    });
-
-    const result = await api('GET', '/ai/test');
-    if (result.connected) {
-      resultEl.innerHTML = '<div class="alert alert-success">Claude AI is connected and ready!</div>';
-    } else {
-      resultEl.innerHTML = `<div class="alert alert-danger">Connection failed: ${result.error}</div>`;
-    }
+    const el = document.getElementById('claude-test-result');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div> Testing...</div>';
+    const r = await api('GET', '/ai/test');
+    el.innerHTML = r.connected
+      ? '<div class="alert alert-success">Claude AI is connected and ready!</div>'
+      : `<div class="alert alert-danger">Failed: ${r.error}</div>`;
   });
 
   // Navigation
   document.getElementById('btn-wizard-next').addEventListener('click', () => {
-    if (currentStep === 3) {
-      window.location.hash = '#/dashboard';
-      return;
-    }
-    saveCurrentStep(currentStep);
+    if (currentStep === 3) { window.location.hash = '#/dashboard'; return; }
     currentStep++;
     updateWizardUI(currentStep);
   });
 
   document.getElementById('btn-wizard-back').addEventListener('click', () => {
-    if (currentStep > 1) {
-      currentStep--;
-      updateWizardUI(currentStep);
-    }
+    if (currentStep > 1) { currentStep--; updateWizardUI(currentStep); }
   });
 
   document.getElementById('btn-wizard-skip').addEventListener('click', () => {
-    if (currentStep === 3) {
-      window.location.hash = '#/dashboard';
-      return;
-    }
+    if (currentStep === 3) { window.location.hash = '#/dashboard'; return; }
     currentStep++;
     updateWizardUI(currentStep);
   });
 
   function updateWizardUI(step) {
-    // Update step indicators
     document.querySelectorAll('.wizard-step').forEach((el) => {
       const s = parseInt(el.dataset.step);
       el.classList.remove('active', 'completed');
       if (s === step) el.classList.add('active');
       if (s < step) el.classList.add('completed');
     });
-
     document.querySelectorAll('.wizard-connector').forEach((el) => {
-      const c = parseInt(el.dataset.connector);
-      el.classList.toggle('completed', c < step);
+      el.classList.toggle('completed', parseInt(el.dataset.connector) < step);
     });
-
-    // Show/hide panels
     document.querySelectorAll('.wizard-panel').forEach((el) => {
       el.classList.toggle('hidden', parseInt(el.dataset.panel) !== step);
     });
-
-    // Update buttons
     document.getElementById('btn-wizard-back').disabled = step === 1;
     document.getElementById('btn-wizard-next').textContent = step === 3 ? 'Finish Setup' : 'Next';
-  }
-
-  async function saveCurrentStep(step) {
-    if (step === 1) {
-      await api('POST', '/settings/meta', {
-        app_id: document.getElementById('meta-app-id').value.trim(),
-        app_secret: document.getElementById('meta-app-secret').value.trim(),
-        ad_account_id: document.getElementById('meta-ad-account-id').value.trim(),
-        access_token: document.getElementById('meta-access-token').value.trim(),
-      });
-    } else if (step === 2) {
-      await api('POST', '/settings/shopify', {
-        store_domain: document.getElementById('shopify-domain').value.trim(),
-        admin_token: document.getElementById('shopify-admin-token').value.trim(),
-      });
-    }
   }
 }
 
@@ -299,11 +238,9 @@ function renderSetup() {
 
 function renderDashboard() {
   const app = document.getElementById('app');
-  const tmpl = document.getElementById('tmpl-dashboard');
-  app.innerHTML = tmpl.innerHTML;
+  app.innerHTML = document.getElementById('tmpl-dashboard').innerHTML;
   initSidebar('dashboard');
 
-  // Fetch analytics summary
   api('GET', '/analytics/summary').then((data) => {
     if (data.account) {
       document.getElementById('stat-spend').textContent = `$${parseFloat(data.account.spend || 0).toFixed(2)}`;
@@ -313,9 +250,7 @@ function renderDashboard() {
     }
   }).catch(() => {});
 
-  // Fetch campaigns
   loadDashboardCampaigns();
-
   document.getElementById('btn-refresh-campaigns').addEventListener('click', loadDashboardCampaigns);
   document.getElementById('btn-new-campaign').addEventListener('click', () => {
     window.location.hash = '#/assistant?action=suggest';
@@ -327,73 +262,25 @@ async function loadDashboardCampaigns() {
   try {
     const data = await api('GET', '/campaigns');
     const campaigns = data.data || [];
-
     if (campaigns.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <h3>No campaigns yet</h3>
-          <p class="text-muted">Use the AI assistant to create your first campaign.</p>
-          <button class="btn btn-primary mt-1" onclick="window.location.hash='#/assistant'">Open AI Assistant</button>
-        </div>`;
+      container.innerHTML = `<div class="empty-state"><h3>No campaigns yet</h3><p class="text-muted">Use the AI assistant to create your first campaign.</p><button class="btn btn-primary mt-1" onclick="window.location.hash='#/assistant'">Open AI Assistant</button></div>`;
       return;
     }
-
-    container.innerHTML = `
-      <table class="campaign-table">
-        <thead>
-          <tr>
-            <th>Campaign</th>
-            <th>Objective</th>
-            <th>Status</th>
-            <th>Budget</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${campaigns.map((c) => `
-            <tr>
-              <td>
-                <div class="campaign-name">${escapeHtml(c.name)}</div>
-              </td>
-              <td><span class="campaign-objective">${formatObjective(c.objective)}</span></td>
-              <td><span class="badge badge-${c.status === 'ACTIVE' ? 'active' : 'paused'}">${c.status}</span></td>
-              <td>${formatBudget(c.daily_budget, c.lifetime_budget)}</td>
-              <td>
-                <div class="flex gap-1">
-                  ${c.status === 'PAUSED'
-                    ? `<button class="btn btn-sm btn-success" onclick="activateCampaign('${c.id}')">Activate</button>`
-                    : `<button class="btn btn-sm btn-outline" onclick="pauseCampaign('${c.id}')">Pause</button>`
-                  }
-                  <button class="btn btn-sm btn-outline" onclick="window.location.hash='#/assistant?assess=${c.id}'">Assess</button>
-                </div>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>`;
+    container.innerHTML = `<table class="campaign-table"><thead><tr><th>Campaign</th><th>Objective</th><th>Status</th><th>Budget</th><th>Actions</th></tr></thead><tbody>${campaigns.map((c) => `<tr><td><div class="campaign-name">${escapeHtml(c.name)}</div></td><td><span class="campaign-objective">${formatObjective(c.objective)}</span></td><td><span class="badge badge-${c.status === 'ACTIVE' ? 'active' : 'paused'}">${c.status}</span></td><td>${formatBudget(c.daily_budget, c.lifetime_budget)}</td><td><div class="flex gap-1">${c.status === 'PAUSED' ? `<button class="btn btn-sm btn-success" onclick="activateCampaign('${c.id}')">Activate</button>` : `<button class="btn btn-sm btn-outline" onclick="pauseCampaign('${c.id}')">Pause</button>`}<button class="btn btn-sm btn-outline" onclick="window.location.hash='#/assistant?assess=${c.id}'">Assess</button></div></td></tr>`).join('')}</tbody></table>`;
   } catch (err) {
-    container.innerHTML = `<div class="alert alert-warning">Could not load campaigns. Check your Meta connection in <a href="#/settings">Settings</a>.</div>`;
+    container.innerHTML = `<div class="alert alert-warning">Could not load campaigns. Check your Facebook connection in <a href="#/settings">Settings</a>.</div>`;
   }
 }
 
-// Global campaign actions
 window.activateCampaign = async function (id) {
   if (!confirm('Activate this campaign? It will start spending your budget.')) return;
-  try {
-    await api('POST', `/campaigns/${id}/activate`);
-    loadDashboardCampaigns();
-  } catch (err) {
-    alert('Failed to activate: ' + err.message);
-  }
+  try { await api('POST', `/campaigns/${id}/activate`); loadDashboardCampaigns(); }
+  catch (err) { alert('Failed to activate: ' + err.message); }
 };
 
 window.pauseCampaign = async function (id) {
-  try {
-    await api('POST', `/campaigns/${id}/pause`);
-    loadDashboardCampaigns();
-  } catch (err) {
-    alert('Failed to pause: ' + err.message);
-  }
+  try { await api('POST', `/campaigns/${id}/pause`); loadDashboardCampaigns(); }
+  catch (err) { alert('Failed to pause: ' + err.message); }
 };
 
 // ============================================================
@@ -404,39 +291,29 @@ let chatHistory = [];
 
 function renderAssistant() {
   const app = document.getElementById('app');
-  const tmpl = document.getElementById('tmpl-assistant');
-  app.innerHTML = tmpl.innerHTML;
+  app.innerHTML = document.getElementById('tmpl-assistant').innerHTML;
   initSidebar('assistant');
 
   const input = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-send-chat');
   const messagesEl = document.getElementById('chat-messages');
 
-  // Auto-resize textarea
   input.addEventListener('input', () => {
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 200) + 'px';
   });
 
-  // Send on Enter (Shift+Enter for newline)
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
 
   sendBtn.addEventListener('click', sendMessage);
 
-  // Quick actions
   document.querySelectorAll('.quick-action').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      input.value = btn.dataset.prompt;
-      sendMessage();
-    });
+    btn.addEventListener('click', () => { input.value = btn.dataset.prompt; sendMessage(); });
   });
 
-  // Check for action in URL
+  // URL-driven actions
   const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
   if (params.get('action') === 'suggest') {
     input.value = 'Suggest a new campaign based on my store products and data. What would you recommend?';
@@ -453,16 +330,13 @@ function renderAssistant() {
     const text = input.value.trim();
     if (!text) return;
 
-    // Add user message to UI
     addMessage('user', text);
     chatHistory.push({ role: 'user', content: text });
     input.value = '';
     input.style.height = 'auto';
 
-    // Hide quick actions after first message
     document.getElementById('quick-actions').style.display = 'none';
 
-    // Show typing indicator
     const typingEl = addMessage('assistant', '<div class="loading">Thinking<div class="loading-dots"><span></span><span></span><span></span></div></div>', true);
 
     try {
@@ -472,36 +346,25 @@ function renderAssistant() {
         includeCampaignData: document.getElementById('include-campaign-data').checked,
       });
 
-      // Remove typing indicator
       typingEl.remove();
-
-      // Add AI response
       const content = response.content || 'I encountered an issue. Please try again.';
       chatHistory.push({ role: 'assistant', content });
       const msgEl = addMessage('assistant', renderMarkdown(content));
 
-      // Check if response contains a campaign spec
       const spec = extractSpecFromResponse(content);
-      if (spec) {
-        addSpecPreview(msgEl, spec);
-      }
-
+      if (spec) addSpecPreview(msgEl, spec);
     } catch (err) {
       typingEl.remove();
       addMessage('assistant', `<div class="alert alert-danger">Error: ${err.message}. Check your Claude API connection in <a href="#/settings">Settings</a>.</div>`, true);
     }
 
-    // Scroll to bottom
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   function addMessage(role, content, isHtml = false) {
     const msgEl = document.createElement('div');
     msgEl.className = `chat-message ${role}`;
-    msgEl.innerHTML = `
-      <div class="chat-avatar">${role === 'assistant' ? 'AI' : 'You'}</div>
-      <div class="chat-bubble">${isHtml ? content : content}</div>
-    `;
+    msgEl.innerHTML = `<div class="chat-avatar">${role === 'assistant' ? 'AI' : 'You'}</div><div class="chat-bubble">${content}</div>`;
     messagesEl.appendChild(msgEl);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return msgEl;
@@ -509,96 +372,53 @@ function renderAssistant() {
 
   function extractSpecFromResponse(text) {
     try {
-      const jsonMatch = text.match(/```json\n?([\s\S]*?)```/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[1]);
-        if (parsed.campaign) return parsed;
-      }
+      const m = text.match(/```json\n?([\s\S]*?)```/);
+      if (m) { const p = JSON.parse(m[1]); if (p.campaign) return p; }
     } catch (e) {}
     return null;
   }
 
   function addSpecPreview(msgEl, spec) {
-    const previewEl = document.createElement('div');
-    previewEl.className = 'spec-preview';
-    previewEl.innerHTML = `
+    const el = document.createElement('div');
+    el.className = 'spec-preview';
+    el.innerHTML = `
       <h4>Campaign Specification Detected</h4>
-      <div class="spec-item">
-        <span class="spec-label">Campaign Name</span>
-        <span class="spec-value">${escapeHtml(spec.campaign?.name || 'Unnamed')}</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-label">Objective</span>
-        <span class="spec-value">${formatObjective(spec.campaign?.objective)}</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-label">Status</span>
-        <span class="spec-value"><span class="badge badge-paused">DRAFT (Paused)</span></span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-label">Ad Sets</span>
-        <span class="spec-value">${(spec.ad_sets || []).length} ad set(s)</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-label">Ads</span>
-        <span class="spec-value">${(spec.ads || []).length} ad(s)</span>
-      </div>
-      ${(spec.ad_sets || []).map((as) => `
-        <div class="spec-item">
-          <span class="spec-label">Budget</span>
-          <span class="spec-value">${as.daily_budget ? '$' + (parseInt(as.daily_budget) / 100).toFixed(2) + '/day' : as.lifetime_budget ? '$' + (parseInt(as.lifetime_budget) / 100).toFixed(2) + ' lifetime' : 'Not set'}</span>
-        </div>
-      `).join('')}
+      <div class="spec-item"><span class="spec-label">Campaign Name</span><span class="spec-value">${escapeHtml(spec.campaign?.name || 'Unnamed')}</span></div>
+      <div class="spec-item"><span class="spec-label">Objective</span><span class="spec-value">${formatObjective(spec.campaign?.objective)}</span></div>
+      <div class="spec-item"><span class="spec-label">Status</span><span class="spec-value"><span class="badge badge-paused">DRAFT (Paused)</span></span></div>
+      <div class="spec-item"><span class="spec-label">Ad Sets</span><span class="spec-value">${(spec.ad_sets || []).length} ad set(s)</span></div>
+      <div class="spec-item"><span class="spec-label">Ads</span><span class="spec-value">${(spec.ads || []).length} ad(s)</span></div>
+      ${(spec.ad_sets || []).map((as) => `<div class="spec-item"><span class="spec-label">Budget</span><span class="spec-value">${as.daily_budget ? '$' + (parseInt(as.daily_budget) / 100).toFixed(2) + '/day' : as.lifetime_budget ? '$' + (parseInt(as.lifetime_budget) / 100).toFixed(2) + ' lifetime' : 'Not set'}</span></div>`).join('')}
       <div class="spec-actions">
         <button class="btn btn-success" id="btn-create-draft">Create as Draft</button>
         <button class="btn btn-outline" id="btn-ask-questions">I have questions</button>
-      </div>
-    `;
+      </div>`;
+    msgEl.querySelector('.chat-bubble').appendChild(el);
 
-    msgEl.querySelector('.chat-bubble').appendChild(previewEl);
-
-    // Create draft handler
-    previewEl.querySelector('#btn-create-draft').addEventListener('click', async () => {
-      const btn = previewEl.querySelector('#btn-create-draft');
+    el.querySelector('#btn-create-draft').addEventListener('click', async () => {
+      const btn = el.querySelector('#btn-create-draft');
       btn.disabled = true;
       btn.textContent = 'Creating...';
-
       try {
         const result = await api('POST', '/campaigns/create-from-spec', spec);
         if (result.success) {
           btn.textContent = 'Created!';
           btn.className = 'btn btn-outline';
-
-          // Add confirmation message
-          chatHistory.push({
-            role: 'user',
-            content: 'I approved the campaign spec. Please confirm what was created.',
-          });
-
-          const confirmText = `Your campaign has been created as a **draft** (PAUSED status). Here's what was set up:
-
-- **Campaign ID**: ${result.results.campaign?.id}
-- **Ad Sets Created**: ${result.results.ad_sets?.length || 0}
-- **Ads Created**: ${result.results.ads?.length || 0}
-
-The campaign is paused and won't spend any money until you activate it. You can review it in the [Campaigns](#/campaigns) tab, or ask me to activate it when you're ready.`;
-
+          chatHistory.push({ role: 'user', content: 'I approved the campaign spec. Please confirm what was created.' });
+          const confirmText = `Your campaign has been created as a **draft** (PAUSED status). Here's what was set up:\n\n- **Campaign ID**: ${result.results.campaign?.id}\n- **Ad Sets Created**: ${result.results.ad_sets?.length || 0}\n- **Ads Created**: ${result.results.ads?.length || 0}\n\nThe campaign is paused and won't spend any money until you activate it. You can review it in the [Campaigns](#/campaigns) tab, or ask me to activate it when you're ready.`;
           chatHistory.push({ role: 'assistant', content: confirmText });
           addMessage('assistant', renderMarkdown(confirmText));
         } else {
-          btn.textContent = 'Failed - Try Again';
-          btn.disabled = false;
+          btn.textContent = 'Failed - Try Again'; btn.disabled = false;
           addMessage('assistant', `<div class="alert alert-danger">Failed to create campaign: ${result.error}</div>`, true);
         }
       } catch (err) {
-        btn.textContent = 'Failed - Try Again';
-        btn.disabled = false;
+        btn.textContent = 'Failed - Try Again'; btn.disabled = false;
         addMessage('assistant', `<div class="alert alert-danger">Error: ${err.message}</div>`, true);
       }
     });
 
-    // Ask questions handler
-    previewEl.querySelector('#btn-ask-questions').addEventListener('click', () => {
+    el.querySelector('#btn-ask-questions').addEventListener('click', () => {
       input.value = 'Before I create this campaign, I have some questions: ';
       input.focus();
     });
@@ -611,13 +431,10 @@ The campaign is paused and won't spend any money until you activate it. You can 
 
 function renderCampaigns() {
   const app = document.getElementById('app');
-  const tmpl = document.getElementById('tmpl-campaigns');
-  app.innerHTML = tmpl.innerHTML;
+  app.innerHTML = document.getElementById('tmpl-campaigns').innerHTML;
   initSidebar('campaigns');
 
   let filter = 'all';
-
-  // Tab filtering
   document.querySelectorAll('.tab').forEach((tab) => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
@@ -639,54 +456,12 @@ async function loadCampaignsTable(filter = 'all') {
   try {
     const data = await api('GET', '/campaigns');
     let campaigns = data.data || [];
-
-    if (filter !== 'all') {
-      campaigns = campaigns.filter((c) => c.status === filter);
-    }
-
+    if (filter !== 'all') campaigns = campaigns.filter((c) => c.status === filter);
     if (campaigns.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <h3>No ${filter !== 'all' ? filter.toLowerCase() : ''} campaigns</h3>
-          <p class="text-muted">Use the AI assistant to create campaigns with natural language.</p>
-        </div>`;
+      container.innerHTML = `<div class="empty-state"><h3>No ${filter !== 'all' ? filter.toLowerCase() : ''} campaigns</h3><p class="text-muted">Use the AI assistant to create campaigns with natural language.</p></div>`;
       return;
     }
-
-    container.innerHTML = `
-      <table class="campaign-table">
-        <thead>
-          <tr>
-            <th>Campaign</th>
-            <th>Objective</th>
-            <th>Status</th>
-            <th>Budget</th>
-            <th>Created</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${campaigns.map((c) => `
-            <tr>
-              <td><div class="campaign-name">${escapeHtml(c.name)}</div></td>
-              <td><span class="campaign-objective">${formatObjective(c.objective)}</span></td>
-              <td><span class="badge badge-${c.status === 'ACTIVE' ? 'active' : 'paused'}">${c.status}</span></td>
-              <td>${formatBudget(c.daily_budget, c.lifetime_budget)}</td>
-              <td class="text-sm text-muted">${c.created_time ? new Date(c.created_time).toLocaleDateString() : '--'}</td>
-              <td>
-                <div class="flex gap-1">
-                  ${c.status === 'PAUSED'
-                    ? `<button class="btn btn-sm btn-success" onclick="activateCampaign('${c.id}'); setTimeout(() => loadCampaignsTable('all'), 1000);">Activate</button>`
-                    : `<button class="btn btn-sm btn-outline" onclick="pauseCampaign('${c.id}'); setTimeout(() => loadCampaignsTable('all'), 1000);">Pause</button>`
-                  }
-                  <button class="btn btn-sm btn-outline" onclick="window.location.hash='#/assistant?assess=${c.id}'">AI Assess</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteCampaignUI('${c.id}')">Delete</button>
-                </div>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>`;
+    container.innerHTML = `<table class="campaign-table"><thead><tr><th>Campaign</th><th>Objective</th><th>Status</th><th>Budget</th><th>Created</th><th>Actions</th></tr></thead><tbody>${campaigns.map((c) => `<tr><td><div class="campaign-name">${escapeHtml(c.name)}</div></td><td><span class="campaign-objective">${formatObjective(c.objective)}</span></td><td><span class="badge badge-${c.status === 'ACTIVE' ? 'active' : 'paused'}">${c.status}</span></td><td>${formatBudget(c.daily_budget, c.lifetime_budget)}</td><td class="text-sm text-muted">${c.created_time ? new Date(c.created_time).toLocaleDateString() : '--'}</td><td><div class="flex gap-1">${c.status === 'PAUSED' ? `<button class="btn btn-sm btn-success" onclick="activateCampaign('${c.id}'); setTimeout(() => loadCampaignsTable('all'), 1000);">Activate</button>` : `<button class="btn btn-sm btn-outline" onclick="pauseCampaign('${c.id}'); setTimeout(() => loadCampaignsTable('all'), 1000);">Pause</button>`}<button class="btn btn-sm btn-outline" onclick="window.location.hash='#/assistant?assess=${c.id}'">AI Assess</button><button class="btn btn-sm btn-danger" onclick="deleteCampaignUI('${c.id}')">Delete</button></div></td></tr>`).join('')}</tbody></table>`;
   } catch (err) {
     container.innerHTML = `<div class="alert alert-warning" style="margin:1rem;">Could not load campaigns. ${err.message}</div>`;
   }
@@ -694,12 +469,8 @@ async function loadCampaignsTable(filter = 'all') {
 
 window.deleteCampaignUI = async function (id) {
   if (!confirm('Delete this campaign? This cannot be undone.')) return;
-  try {
-    await api('DELETE', `/campaigns/${id}`);
-    loadCampaignsTable('all');
-  } catch (err) {
-    alert('Failed to delete: ' + err.message);
-  }
+  try { await api('DELETE', `/campaigns/${id}`); loadCampaignsTable('all'); }
+  catch (err) { alert('Failed to delete: ' + err.message); }
 };
 
 // ============================================================
@@ -708,70 +479,36 @@ window.deleteCampaignUI = async function (id) {
 
 function renderAnalytics() {
   const app = document.getElementById('app');
-  const tmpl = document.getElementById('tmpl-analytics');
-  app.innerHTML = tmpl.innerHTML;
+  app.innerHTML = document.getElementById('tmpl-analytics').innerHTML;
   initSidebar('analytics');
 
   const dateSelect = document.getElementById('date-range');
   dateSelect.addEventListener('change', () => loadAnalytics(dateSelect.value));
-
   document.getElementById('btn-ai-assess').addEventListener('click', runAiAssessment);
   document.getElementById('btn-close-assessment').addEventListener('click', () => {
     document.getElementById('ai-assessment-card').classList.add('hidden');
   });
-
   loadAnalytics('last_30d');
 }
 
 async function loadAnalytics(datePreset) {
   try {
     const data = await api('GET', `/analytics/summary?date_preset=${datePreset}`);
-
     if (data.account) {
       document.getElementById('a-stat-spend').textContent = `$${parseFloat(data.account.spend || 0).toFixed(2)}`;
       document.getElementById('a-stat-reach').textContent = formatNumber(data.account.reach || 0);
       document.getElementById('a-stat-clicks').textContent = formatNumber(data.account.clicks || 0);
       document.getElementById('a-stat-cpc').textContent = `$${parseFloat(data.account.cpc || 0).toFixed(2)}`;
     }
-
     const container = document.getElementById('analytics-campaigns-list');
     const campaigns = data.top_campaigns || [];
-
     if (campaigns.length === 0) {
       container.innerHTML = '<div class="empty-state"><h3>No active campaigns with data</h3></div>';
       return;
     }
-
-    container.innerHTML = `
-      <table class="campaign-table">
-        <thead>
-          <tr>
-            <th>Campaign</th>
-            <th>Spend</th>
-            <th>Impressions</th>
-            <th>Clicks</th>
-            <th>CTR</th>
-            <th>CPC</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${campaigns.map((c) => {
-            const i = c.insights || {};
-            return `
-              <tr>
-                <td><div class="campaign-name">${escapeHtml(c.name)}</div></td>
-                <td>$${parseFloat(i.spend || 0).toFixed(2)}</td>
-                <td>${formatNumber(i.impressions || 0)}</td>
-                <td>${formatNumber(i.clicks || 0)}</td>
-                <td>${parseFloat(i.ctr || 0).toFixed(2)}%</td>
-                <td>$${parseFloat(i.cpc || 0).toFixed(2)}</td>
-              </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
+    container.innerHTML = `<table class="campaign-table"><thead><tr><th>Campaign</th><th>Spend</th><th>Impressions</th><th>Clicks</th><th>CTR</th><th>CPC</th></tr></thead><tbody>${campaigns.map((c) => { const i = c.insights || {}; return `<tr><td><div class="campaign-name">${escapeHtml(c.name)}</div></td><td>$${parseFloat(i.spend || 0).toFixed(2)}</td><td>${formatNumber(i.impressions || 0)}</td><td>${formatNumber(i.clicks || 0)}</td><td>${parseFloat(i.ctr || 0).toFixed(2)}%</td><td>$${parseFloat(i.cpc || 0).toFixed(2)}</td></tr>`; }).join('')}</tbody></table>`;
   } catch (err) {
-    document.getElementById('analytics-campaigns-list').innerHTML =
-      `<div class="alert alert-warning">Could not load analytics. Check your Meta connection.</div>`;
+    document.getElementById('analytics-campaigns-list').innerHTML = '<div class="alert alert-warning">Could not load analytics. Check your Facebook connection.</div>';
   }
 }
 
@@ -780,7 +517,6 @@ async function runAiAssessment() {
   const content = document.getElementById('ai-assessment-content');
   card.classList.remove('hidden');
   content.innerHTML = '<div class="loading"><div class="spinner"></div> AI is analyzing your campaigns...</div>';
-
   try {
     const datePreset = document.getElementById('date-range').value;
     const result = await api('POST', '/ai/assess', { datePreset });
@@ -796,11 +532,32 @@ async function runAiAssessment() {
 
 function renderSettings() {
   const app = document.getElementById('app');
-  const tmpl = document.getElementById('tmpl-settings');
-  app.innerHTML = tmpl.innerHTML;
+  app.innerHTML = document.getElementById('tmpl-settings').innerHTML;
   initSidebar('settings');
 
   checkConnectionStatus();
+
+  // Show env var status
+  api('GET', '/settings').then((s) => {
+    const el = document.getElementById('env-var-status');
+    if (!el) return;
+    const vars = [
+      ['FACEBOOK_APP_ID', s.facebook?.app_id],
+      ['FACEBOOK_APP_SECRET', s.facebook?.app_secret],
+      ['FACEBOOK_AD_ACCOUNT_ID', s.facebook?.ad_account_id],
+      ['FACEBOOK_ACCESS_TOKEN', s.facebook?.access_token],
+      ['SHOPIFY_CLIENT_ID', s.shopify?.client_id],
+      ['SHOPIFY_API_KEY', s.shopify?.api_key],
+      ['ANTHROPIC_API_KEY', s.claude?.api_key],
+    ];
+    el.innerHTML = vars.map(([name, isSet]) =>
+      `<div class="flex gap-1 mb-1" style="align-items:center;font-size:0.85rem;">
+        <span class="status-dot ${isSet ? 'connected' : 'disconnected'}"></span>
+        <code>${name}</code>
+        <span class="text-muted">${isSet ? 'configured' : 'not set'}</span>
+      </div>`
+    ).join('');
+  });
 }
 
 async function checkConnectionStatus() {
@@ -809,7 +566,6 @@ async function checkConnectionStatus() {
     { key: 'shopify', endpoint: '/shopify/test', dot: 'status-shopify', text: 'status-shopify-text' },
     { key: 'claude', endpoint: '/ai/test', dot: 'status-claude', text: 'status-claude-text' },
   ];
-
   for (const check of checks) {
     const dot = document.getElementById(check.dot);
     const text = document.getElementById(check.text);
@@ -817,13 +573,9 @@ async function checkConnectionStatus() {
       const result = await api('GET', check.endpoint);
       if (result.connected) {
         dot.className = 'status-dot connected';
-        if (check.key === 'meta') {
-          text.textContent = `Connected: ${result.account_name || result.account_id}`;
-        } else if (check.key === 'shopify') {
-          text.textContent = `Connected: ${result.shop_name || result.domain}`;
-        } else {
-          text.textContent = 'Connected';
-        }
+        text.textContent = check.key === 'meta' ? `Connected: ${result.account_name || result.account_id}`
+          : check.key === 'shopify' ? `Connected: ${result.shop_name || result.domain}`
+          : 'Connected';
       } else {
         dot.className = 'status-dot disconnected';
         text.textContent = `Not connected: ${result.error || 'Unknown error'}`;
@@ -848,11 +600,7 @@ function formatNumber(n) {
 
 function formatObjective(obj) {
   if (!obj) return '--';
-  return obj
-    .replace('OUTCOME_', '')
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return obj.replace('OUTCOME_', '').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function formatBudget(daily, lifetime) {

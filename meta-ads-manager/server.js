@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const session = require('express-session');
 const path = require('path');
 
 const authRoutes = require('./routes/auth');
@@ -13,17 +12,8 @@ const settingsRoutes = require('./routes/settings');
 const app = express();
 const PORT = process.env.PORT || 3456;
 
-// Middleware
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'meta-ads-dev-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 },
-  })
-);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
@@ -34,14 +24,30 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/shopify', shopifyRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Serve the SPA for all non-API routes
+// SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
   console.log(`\n  Meta Ads Manager is running at http://localhost:${PORT}\n`);
-  console.log('  Setup wizard:  http://localhost:' + PORT + '/#/setup');
-  console.log('  Dashboard:     http://localhost:' + PORT + '/#/dashboard');
-  console.log('  AI Assistant:  http://localhost:' + PORT + '/#/assistant\n');
+
+  // Startup config check
+  const missing = [];
+  if (!process.env.FACEBOOK_APP_ID) missing.push('FACEBOOK_APP_ID');
+  if (!process.env.FACEBOOK_APP_SECRET) missing.push('FACEBOOK_APP_SECRET');
+  if (!process.env.FACEBOOK_AD_ACCOUNT_ID) missing.push('FACEBOOK_AD_ACCOUNT_ID');
+  if (!process.env.FACEBOOK_ACCESS_TOKEN) missing.push('FACEBOOK_ACCESS_TOKEN');
+  if (!process.env.SHOPIFY_CLIENT_ID) missing.push('SHOPIFY_CLIENT_ID');
+  if (!process.env.SHOPIFY_API_KEY) missing.push('SHOPIFY_API_KEY');
+  if (!process.env.ANTHROPIC_API_KEY) missing.push('ANTHROPIC_API_KEY');
+
+  if (missing.length) {
+    console.log('  Missing env vars (set these before using the app):');
+    missing.forEach((v) => console.log(`    - ${v}`));
+    console.log('');
+    console.log('  See .env.example for details.\n');
+  } else {
+    console.log('  All credentials configured.\n');
+  }
 });

@@ -1,218 +1,133 @@
 # Meta Ads Manager — AI-Powered Campaign Management for Shopify
 
-A self-hosted web application that connects your Shopify store to Meta (Facebook/Instagram) Ads Manager with an AI assistant powered by Claude. Describe campaigns in plain English, get suggestions, create drafts, review them, and publish — all through conversation.
+A lightweight, self-hosted Node.js app that connects your Shopify store to Facebook (Meta) Ads Manager with an AI assistant powered by Claude. Describe campaigns in plain English, get suggestions, create drafts, review them, and publish — all through conversation.
 
 ## What It Does
 
-- **Natural language campaign creation**: Tell the AI what you want ("Run a campaign to promote my summer collection to women 25-45 in the US") and it builds the full campaign structure
-- **Draft-first workflow**: All campaigns are created in PAUSED status. Nothing goes live until you explicitly approve and activate
-- **Performance assessment**: Ask the AI to analyze your running campaigns and get specific, actionable recommendations
-- **Full campaign management**: Create, pause, activate, and delete campaigns, ad sets, and ads from the dashboard
-- **Store-aware suggestions**: The AI reads your Shopify products, collections, and sales data to make informed ad recommendations
+- **Natural language campaign creation**: Tell the AI what you want and it builds the full campaign structure
+- **Draft-first workflow**: All campaigns are created in PAUSED status — nothing goes live without explicit approval
+- **Performance assessment**: Ask the AI to analyze running campaigns and get actionable recommendations
+- **Full campaign management**: Create, pause, activate, and delete campaigns from the dashboard
+- **Store-aware suggestions**: The AI reads your Shopify products, collections, and sales data
+
+## Security Model
+
+Credentials are managed **exclusively through environment variables**. The web UI:
+- Never accepts secrets through form fields
+- Never writes to `.env` or any file on disk
+- Only reports which env vars are set (true/false), never their values
+- The settings API is read-only
+
+## Environment Variables
+
+```bash
+# Facebook (Meta) Marketing API
+FACEBOOK_APP_ID=123456789012345
+FACEBOOK_APP_SECRET=your_app_secret
+FACEBOOK_AD_ACCOUNT_ID=act_123456789
+FACEBOOK_ACCESS_TOKEN=your_long_lived_token
+
+# Shopify Store
+SHOPIFY_CLIENT_ID=your-store.myshopify.com
+SHOPIFY_API_KEY=shpat_xxxxxxxxxxxxx
+
+# Anthropic Claude API
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxx
+
+# Optional
+PORT=3456
+APP_URL=http://localhost:3456
+```
+
+## Prerequisites
+
+### 1. Facebook Business Account + Developer App
+
+1. Go to [business.facebook.com](https://business.facebook.com/) and create/log into your Business account
+2. Create an Ad Account: Business Settings > Ad Accounts > Add
+3. Create a developer app at [developers.facebook.com/apps](https://developers.facebook.com/apps/) (type: Business, add Marketing API)
+4. Copy **App ID** and **App Secret** from Settings > Basic → set as `FACEBOOK_APP_ID` and `FACEBOOK_APP_SECRET`
+5. Find your **Ad Account ID** (with `act_` prefix) → set as `FACEBOOK_AD_ACCOUNT_ID`
+
+**Getting an Access Token:**
+
+- **Option A — OAuth**: Set `FACEBOOK_APP_ID` and `FACEBOOK_APP_SECRET` in your env, start the server, and click "Generate Token via Facebook Login" in the setup wizard. The token is displayed once — copy it into your env as `FACEBOOK_ACCESS_TOKEN` and restart.
+- **Option B — Graph API Explorer**: Go to [developers.facebook.com/tools/explorer](https://developers.facebook.com/tools/explorer/), select your app, request permissions `ads_management`, `ads_read`, `business_management`. Generate a token → set as `FACEBOOK_ACCESS_TOKEN`.
+
+### 2. Shopify Custom App
+
+1. In Shopify Admin: **Settings > Apps and sales channels > Develop apps**
+2. Create an app named "Meta Ads Manager"
+3. Configure Admin API scopes: `read_products`, `read_orders`, `read_customers`
+4. Install the app and copy the Admin API access token (starts with `shpat_`)
+5. Set `SHOPIFY_CLIENT_ID` to your store's `.myshopify.com` domain
+6. Set `SHOPIFY_API_KEY` to the access token
+
+### 3. Anthropic API Key
+
+1. Go to [console.anthropic.com](https://console.anthropic.com/)
+2. Create an API key → set as `ANTHROPIC_API_KEY`
+
+## Installation & Startup
+
+```bash
+cd meta-ads-manager
+cp .env.example .env   # Edit with your credentials
+npm install
+npm start              # http://localhost:3456
+```
+
+The setup wizard at `/#/setup` shows which env vars are set, explains how to obtain each credential, and lets you test each connection.
+
+## Usage
+
+### AI Assistant (`/#/assistant`)
+
+The core feature. Chat with Claude to:
+
+- **"Suggest a campaign to drive traffic to my best-selling products"** → AI analyzes your Shopify catalog and builds a full campaign spec
+- **"Create a retargeting campaign for store visitors"** → AI structures targeting, budget, and ad copy
+- **"How are my campaigns doing?"** → AI pulls Facebook Insights data and provides analysis
+- **"Activate the summer campaign"** → Execute changes through conversation
+
+When the AI suggests a campaign, a **"Create as Draft"** button appears. Click it to create the campaign in Facebook's system in PAUSED status.
+
+### Dashboard (`/#/dashboard`)
+
+Spend, impressions, clicks, CTR. Lists all campaigns with activate/pause controls.
+
+### Analytics (`/#/analytics`)
+
+Performance metrics with date range filtering and Claude-powered AI Assessment.
+
+### Settings (`/#/settings`)
+
+Read-only view of which env vars are configured and live connection status for each service.
 
 ## Architecture
 
 ```
 meta-ads-manager/
-├── server.js              Express server (entry point)
+├── server.js              Lightweight Express server
 ├── services/
-│   ├── meta-api.js        Meta Marketing API wrapper
+│   ├── meta-api.js        Facebook Marketing API wrapper
 │   ├── shopify-api.js     Shopify Admin API wrapper
 │   └── claude-ai.js       Claude AI conversation service
 ├── routes/
-│   ├── auth.js            Meta OAuth flow
-│   ├── campaigns.js       Campaign CRUD + bulk creation
-│   ├── ai.js              AI chat, suggestions, assessment
-│   ├── analytics.js       Performance metrics
+│   ├── auth.js            Facebook OAuth flow
+│   ├── campaigns.js       Campaign CRUD + bulk creation from AI specs
+│   ├── ai.js              AI chat, suggestions, performance assessment
+│   ├── analytics.js       Performance metrics from Facebook Insights
 │   ├── shopify.js         Store data endpoints
-│   └── settings.js        Configuration management
+│   └── settings.js        Read-only env var status
 └── public/                Single-page web application
     ├── index.html         SPA shell with all view templates
     ├── css/styles.css     Dark theme UI
     └── js/app.js          Client-side router and controllers
 ```
 
-## Prerequisites
+Dependencies: `express`, `dotenv`, `node-fetch`, `@anthropic-ai/sdk` (4 packages).
 
-You need three things:
+## Connecting Meta Pixel to Shopify
 
-### 1. Meta Business Account + Developer App
-
-1. Go to [business.facebook.com](https://business.facebook.com/) and create or log into your Business account
-2. Create an Ad Account if you don't have one: Business Settings > Ad Accounts > Add
-3. Go to [developers.facebook.com/apps](https://developers.facebook.com/apps/) and create a new app:
-   - Choose **Business** type
-   - Add the **Marketing API** product
-4. Note your **App ID** and **App Secret** from Settings > Basic
-5. Note your **Ad Account ID** (format: `act_XXXXXXXXX`) from Business Settings > Ad Accounts
-
-**Getting an Access Token (two options):**
-
-- **Option A — OAuth (recommended)**: The setup wizard handles this. Enter your App ID and App Secret, then click "Connect with Facebook" to authorize via OAuth. This generates a long-lived token (60 days).
-- **Option B — Graph API Explorer**: Go to [developers.facebook.com/tools/explorer](https://developers.facebook.com/tools/explorer/), select your app, and request these permissions: `ads_management`, `ads_read`, `business_management`, `pages_read_engagement`. Generate a token and paste it into the setup wizard.
-
-### 2. Shopify Custom App
-
-1. In your Shopify Admin, go to **Settings > Apps and sales channels > Develop apps**
-2. Enable custom app development if prompted
-3. Click **Create an app**, name it "Meta Ads Manager"
-4. Click **Configure Admin API scopes** and enable:
-   - `read_products` — so the AI can see your product catalog
-   - `read_orders` — so the AI can understand sales patterns
-   - `read_customers` — for audience insight (optional)
-5. Click **Install app** and copy the **Admin API access token** (starts with `shpat_`)
-
-### 3. Anthropic API Key
-
-1. Go to [console.anthropic.com](https://console.anthropic.com/)
-2. Create an account or log in
-3. Go to **API Keys** and create a new key
-4. Copy the key (starts with `sk-ant-`)
-
-## Installation
-
-```bash
-cd meta-ads-manager
-npm install
-```
-
-## Configuration
-
-### Option A: Use the setup wizard (recommended)
-
-```bash
-npm start
-```
-
-Open `http://localhost:3456` in your browser. The setup wizard walks you through connecting all three services with inline instructions and connection testing.
-
-### Option B: Manual .env file
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and fill in your credentials:
-
-```
-META_APP_ID=123456789012345
-META_APP_SECRET=your_app_secret
-META_AD_ACCOUNT_ID=act_123456789
-META_ACCESS_TOKEN=your_long_lived_token
-META_API_VERSION=v21.0
-
-SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-SHOPIFY_ADMIN_TOKEN=shpat_xxxxxxxxxxxxx
-
-ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxx
-
-PORT=3456
-SESSION_SECRET=some-random-secret-string
-APP_URL=http://localhost:3456
-```
-
-Then start the server:
-
-```bash
-npm start
-```
-
-## Usage
-
-### Setup Wizard (`http://localhost:3456/#/setup`)
-
-Three-step wizard that guides you through connecting Meta, Shopify, and Claude. Each step has a "Test Connection" button to verify your credentials before proceeding.
-
-### Dashboard (`http://localhost:3456/#/dashboard`)
-
-Overview of your advertising account: total spend, impressions, clicks, and CTR. Lists all campaigns with quick actions to activate, pause, or request an AI assessment.
-
-### AI Assistant (`http://localhost:3456/#/assistant`)
-
-The core feature. A chat interface where you interact with Claude to:
-
-**Suggest campaigns:**
-> "Suggest a campaign to drive traffic to my best-selling products"
-
-The AI analyzes your Shopify product catalog, recent sales, and store data, then suggests a complete campaign structure with targeting, budget, and ad copy.
-
-**Create drafts:**
-When the AI suggests a campaign, a "Create as Draft" button appears. Click it to create the campaign in Meta's system in PAUSED status. Nothing is spent until you activate.
-
-**Ask questions:**
-> "Why did you choose that targeting? What about a younger audience?"
-> "Can we lower the budget to $10/day instead?"
-
-The AI explains its reasoning and can adjust the spec.
-
-**Assess performance:**
-> "How are my campaigns doing? Any I should pause?"
-
-The AI pulls real performance data from Meta's Insights API and provides analysis with specific recommendations.
-
-**Execute changes:**
-> "Go ahead and activate the summer collection campaign"
-> "Pause the campaign that's underperforming"
-
-### Campaigns (`http://localhost:3456/#/campaigns`)
-
-Full campaign management view. Filter by status (All / Active / Paused). Activate, pause, delete, or request AI assessment for any campaign.
-
-### Analytics (`http://localhost:3456/#/analytics`)
-
-Performance metrics across your account with date range filtering. Click "AI Assessment" for a Claude-powered analysis of your campaign performance with actionable next steps.
-
-## How the AI Works
-
-When you chat with the assistant:
-
-1. **Context gathering**: The app fetches your Shopify products, collections, and recent orders, plus your Meta campaign data
-2. **Claude analysis**: This context is sent to Claude along with your message and conversation history
-3. **Structured output**: Claude responds with explanations in plain English, plus structured JSON campaign specs when appropriate
-4. **Spec extraction**: The app detects campaign specs in Claude's response and shows a preview card with a "Create as Draft" button
-5. **API execution**: When you approve, the app calls Meta's Marketing API to create the campaign, ad sets, ad creatives, and ads — all in PAUSED status
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/auth/meta/test` | Test Meta connection |
-| GET | `/api/auth/meta/login` | Start Meta OAuth flow |
-| POST | `/api/ai/chat` | Chat with AI assistant |
-| POST | `/api/ai/suggest` | Get campaign suggestions |
-| POST | `/api/ai/assess` | Get performance assessment |
-| GET | `/api/campaigns` | List all campaigns |
-| POST | `/api/campaigns` | Create a campaign |
-| POST | `/api/campaigns/create-from-spec` | Create full campaign from AI spec |
-| POST | `/api/campaigns/:id/activate` | Activate (publish) a campaign |
-| POST | `/api/campaigns/:id/pause` | Pause a campaign |
-| GET | `/api/analytics/summary` | Dashboard analytics |
-| GET | `/api/analytics/campaign/:id` | Campaign-specific insights |
-| GET | `/api/shopify/products` | List Shopify products |
-| GET | `/api/shopify/summary` | Store summary for AI context |
-| GET/POST | `/api/settings` | Read/update configuration |
-
-## Security Notes
-
-- The `.env` file contains sensitive API keys. It is listed in `.gitignore` and should never be committed.
-- The app is designed for local/private use. If deploying to a server, add authentication middleware to protect the API endpoints.
-- Meta access tokens expire after 60 days. The app will notify you when re-authentication is needed.
-- All campaign creation defaults to PAUSED status to prevent accidental ad spend.
-
-## Connecting Meta to Shopify (Meta Pixel / CAPI)
-
-For optimal ad performance, you should also install the **Meta Pixel** on your Shopify store. This enables:
-
-- **Conversion tracking**: Meta knows when ad clicks lead to purchases
-- **Retargeting audiences**: Create audiences of people who visited your store
-- **Lookalike audiences**: Find new customers similar to your buyers
-
-To set this up:
-
-1. In Meta Business Suite, go to **Events Manager** > **Data Sources** > **Add** > **Web**
-2. Name it and click **Connect** > **Meta Pixel**
-3. In Shopify Admin, go to **Online Store** > **Preferences**
-4. Paste your **Meta Pixel ID** in the Facebook Pixel field
-5. For server-side tracking (CAPI), install the **Facebook & Instagram** sales channel from the Shopify App Store
-
-This Ads Manager app handles campaign creation and management. The Pixel/CAPI handles conversion tracking independently.
+For conversion tracking (so Facebook knows when ad clicks lead to purchases), separately install the **Facebook & Instagram** sales channel from the Shopify App Store, or manually add your Meta Pixel ID in Shopify Admin > Online Store > Preferences.

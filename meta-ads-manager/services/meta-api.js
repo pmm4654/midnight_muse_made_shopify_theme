@@ -10,7 +10,7 @@ const fetch = require('node-fetch');
 const BASE = 'https://graph.facebook.com';
 
 function apiVersion() {
-  return process.env.META_API_VERSION || 'v21.0';
+  return process.env.FACEBOOK_API_VERSION || 'v21.0';
 }
 
 function url(endpoint) {
@@ -22,11 +22,11 @@ function headers() {
 }
 
 function token() {
-  return process.env.META_ACCESS_TOKEN;
+  return process.env.FACEBOOK_ACCESS_TOKEN;
 }
 
 function adAccountId() {
-  const raw = process.env.META_AD_ACCOUNT_ID || '';
+  const raw = process.env.FACEBOOK_AD_ACCOUNT_ID || '';
   return raw.startsWith('act_') ? raw : `act_${raw}`;
 }
 
@@ -219,8 +219,8 @@ async function activateAd(adId) {
 
 async function exchangeCodeForToken(code, redirectUri) {
   const params = new URLSearchParams({
-    client_id: process.env.META_APP_ID,
-    client_secret: process.env.META_APP_SECRET,
+    client_id: process.env.FACEBOOK_APP_ID,
+    client_secret: process.env.FACEBOOK_APP_SECRET,
     redirect_uri: redirectUri,
     code,
   });
@@ -231,8 +231,8 @@ async function exchangeCodeForToken(code, redirectUri) {
 async function getLongLivedToken(shortToken) {
   const params = new URLSearchParams({
     grant_type: 'fb_exchange_token',
-    client_id: process.env.META_APP_ID,
-    client_secret: process.env.META_APP_SECRET,
+    client_id: process.env.FACEBOOK_APP_ID,
+    client_secret: process.env.FACEBOOK_APP_SECRET,
     fb_exchange_token: shortToken,
   });
   const res = await fetch(`${BASE}/${apiVersion()}/oauth/access_token?${params}`);
@@ -240,7 +240,7 @@ async function getLongLivedToken(shortToken) {
 }
 
 async function getTokenInfo() {
-  const res = await fetch(`${BASE}/debug_token?input_token=${token()}&access_token=${process.env.META_APP_ID}|${process.env.META_APP_SECRET}`);
+  const res = await fetch(`${BASE}/debug_token?input_token=${token()}&access_token=${process.env.FACEBOOK_APP_ID}|${process.env.FACEBOOK_APP_SECRET}`);
   return res.json();
 }
 

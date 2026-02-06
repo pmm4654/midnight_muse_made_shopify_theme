@@ -2,19 +2,23 @@
  * Shopify API Service
  *
  * Fetches product, collection, and store data from Shopify to inform
- * AI-powered ad suggestions. Uses both Storefront API (public product data)
- * and Admin API (orders, analytics).
+ * AI-powered ad suggestions. Uses the Admin API for products, orders,
+ * and store metadata.
+ *
+ * Required env vars:
+ *   SHOPIFY_CLIENT_ID  — Shopify app client ID (store identifier)
+ *   SHOPIFY_API_KEY    — Admin API access token (shpat_xxx)
  */
 const fetch = require('node-fetch');
 
 function storeDomain() {
-  return (process.env.SHOPIFY_STORE_DOMAIN || '').replace(/\/$/, '');
+  return (process.env.SHOPIFY_CLIENT_ID || '').replace(/\/$/, '');
 }
 
 function adminHeaders() {
   return {
     'Content-Type': 'application/json',
-    'X-Shopify-Access-Token': process.env.SHOPIFY_ADMIN_TOKEN,
+    'X-Shopify-Access-Token': process.env.SHOPIFY_API_KEY,
   };
 }
 
