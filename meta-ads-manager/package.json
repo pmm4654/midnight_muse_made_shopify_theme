@@ -1,0 +1,17 @@
+{
+  "name": "meta-ads-manager",
+  "version": "1.0.0",
+  "description": "AI-powered Meta Ads Manager for Shopify stores — uses Claude to suggest, build, and manage ad campaigns via natural language",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "express-session": "^1.18.0",
+    "dotenv": "^16.4.0",
+    "node-fetch": "^2.7.0",
+    "@anthropic-ai/sdk": "^0.39.0"
+  }
+}
