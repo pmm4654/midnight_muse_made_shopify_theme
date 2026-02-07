@@ -154,6 +154,7 @@ function renderSetup() {
       ['FACEBOOK_ACCESS_TOKEN', s.facebook?.access_token],
     ]);
     renderEnvStatus('shopify-env-status', [
+      ['SHOPIFY_STORE_DOMAIN', s.shopify?.store_domain],
       ['SHOPIFY_CLIENT_ID', s.shopify?.client_id],
       ['SHOPIFY_API_KEY', s.shopify?.api_key],
     ]);
@@ -546,6 +547,7 @@ function renderSettings() {
       ['FACEBOOK_APP_SECRET', s.facebook?.app_secret],
       ['FACEBOOK_AD_ACCOUNT_ID', s.facebook?.ad_account_id],
       ['FACEBOOK_ACCESS_TOKEN', s.facebook?.access_token],
+      ['SHOPIFY_STORE_DOMAIN', s.shopify?.store_domain],
       ['SHOPIFY_CLIENT_ID', s.shopify?.client_id],
       ['SHOPIFY_API_KEY', s.shopify?.api_key],
       ['ANTHROPIC_API_KEY', s.claude?.api_key],

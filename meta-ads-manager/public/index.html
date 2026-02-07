@@ -102,7 +102,8 @@ FACEBOOK_ACCESS_TOKEN=your_long_lived_token</code></pre>
               <div class="alert alert-info mb-2">
                 <div>
                   <strong>Required environment variables:</strong>
-                  <pre style="background:var(--color-bg);padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.82rem;line-height:1.7;overflow-x:auto;"><code>SHOPIFY_CLIENT_ID=your-store.myshopify.com
+                  <pre style="background:var(--color-bg);padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.82rem;line-height:1.7;overflow-x:auto;"><code>SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
+SHOPIFY_CLIENT_ID=your_app_client_id
 SHOPIFY_API_KEY=shpat_xxxxxxxxxxxxx</code></pre>
                 </div>
               </div>
@@ -116,7 +117,8 @@ SHOPIFY_API_KEY=shpat_xxxxxxxxxxxxx</code></pre>
                     <li>Click <strong>Create an app</strong>, name it "Meta Ads Manager"</li>
                     <li>Configure <strong>Admin API scopes</strong>: <code>read_products</code>, <code>read_orders</code>, <code>read_customers</code></li>
                     <li>Install the app and copy the <strong>Admin API access token</strong> (starts with <code>shpat_</code>)</li>
-                    <li><code>SHOPIFY_CLIENT_ID</code> = your store's <code>.myshopify.com</code> domain</li>
+                    <li><code>SHOPIFY_STORE_DOMAIN</code> = your store's <code>.myshopify.com</code> domain</li>
+                    <li><code>SHOPIFY_CLIENT_ID</code> = the app's client ID from the API credentials page</li>
                     <li><code>SHOPIFY_API_KEY</code> = the Admin API access token you copied</li>
                   </ol>
                 </div>

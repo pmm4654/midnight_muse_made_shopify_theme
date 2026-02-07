@@ -25,13 +25,14 @@ router.get('/', (req, res) => {
     shopify: {
       client_id: isSet('SHOPIFY_CLIENT_ID'),
       api_key: isSet('SHOPIFY_API_KEY'),
+      store_domain: isSet('SHOPIFY_STORE_DOMAIN'),
     },
     claude: {
       api_key: isSet('ANTHROPIC_API_KEY'),
     },
     configured: {
       facebook: isSet('FACEBOOK_APP_ID') && isSet('FACEBOOK_APP_SECRET') && isSet('FACEBOOK_AD_ACCOUNT_ID') && isSet('FACEBOOK_ACCESS_TOKEN'),
-      shopify: isSet('SHOPIFY_CLIENT_ID') && isSet('SHOPIFY_API_KEY'),
+      shopify: isSet('SHOPIFY_CLIENT_ID') && isSet('SHOPIFY_API_KEY') && isSet('SHOPIFY_STORE_DOMAIN'),
       claude: isSet('ANTHROPIC_API_KEY'),
     },
   });

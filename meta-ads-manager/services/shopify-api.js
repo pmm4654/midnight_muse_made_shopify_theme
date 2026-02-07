@@ -6,13 +6,14 @@
  * and store metadata.
  *
  * Required env vars:
- *   SHOPIFY_CLIENT_ID  — Shopify app client ID (store identifier)
- *   SHOPIFY_API_KEY    — Admin API access token (shpat_xxx)
+ *   SHOPIFY_CLIENT_ID    — Shopify app client ID
+ *   SHOPIFY_API_KEY      — Admin API access token (shpat_xxx)
+ *   SHOPIFY_STORE_DOMAIN — your-store.myshopify.com
  */
 const fetch = require('node-fetch');
 
 function storeDomain() {
-  return (process.env.SHOPIFY_CLIENT_ID || '').replace(/\/$/, '');
+  return (process.env.SHOPIFY_STORE_DOMAIN || '').replace(/\/$/, '');
 }
 
 function adminHeaders() {

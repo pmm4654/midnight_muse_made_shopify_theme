@@ -40,6 +40,7 @@ app.listen(PORT, () => {
   if (!process.env.FACEBOOK_ACCESS_TOKEN) missing.push('FACEBOOK_ACCESS_TOKEN');
   if (!process.env.SHOPIFY_CLIENT_ID) missing.push('SHOPIFY_CLIENT_ID');
   if (!process.env.SHOPIFY_API_KEY) missing.push('SHOPIFY_API_KEY');
+  if (!process.env.SHOPIFY_STORE_DOMAIN) missing.push('SHOPIFY_STORE_DOMAIN');
   if (!process.env.ANTHROPIC_API_KEY) missing.push('ANTHROPIC_API_KEY');
 
   if (missing.length) {

@@ -28,7 +28,8 @@ FACEBOOK_AD_ACCOUNT_ID=act_123456789
 FACEBOOK_ACCESS_TOKEN=your_long_lived_token
 
 # Shopify Store
-SHOPIFY_CLIENT_ID=your-store.myshopify.com
+SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
+SHOPIFY_CLIENT_ID=your_app_client_id
 SHOPIFY_API_KEY=shpat_xxxxxxxxxxxxx
 
 # Anthropic Claude API
@@ -59,9 +60,10 @@ APP_URL=http://localhost:3456
 1. In Shopify Admin: **Settings > Apps and sales channels > Develop apps**
 2. Create an app named "Meta Ads Manager"
 3. Configure Admin API scopes: `read_products`, `read_orders`, `read_customers`
-4. Install the app and copy the Admin API access token (starts with `shpat_`)
-5. Set `SHOPIFY_CLIENT_ID` to your store's `.myshopify.com` domain
-6. Set `SHOPIFY_API_KEY` to the access token
+4. Install the app and copy the **Admin API access token** (starts with `shpat_`) and the **Client ID**
+5. Set `SHOPIFY_STORE_DOMAIN` to your store's `.myshopify.com` domain
+6. Set `SHOPIFY_CLIENT_ID` to the app's client ID
+7. Set `SHOPIFY_API_KEY` to the Admin API access token
 
 ### 3. Anthropic API Key
 
