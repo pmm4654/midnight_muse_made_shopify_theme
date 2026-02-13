@@ -547,7 +547,6 @@
         "type": "text",
         "id": "customizable_product_cta",
         "label": "Customizable product button text",
-        "default": "",
         "info": "Leave blank to use the default translation (\"Customize Now\")"
       },
       {

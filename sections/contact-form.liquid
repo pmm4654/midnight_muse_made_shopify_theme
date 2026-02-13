@@ -135,6 +135,22 @@
   </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var contactForm = document.querySelector('#ContactForm') || document.querySelector('form[action*="contact"]');
+    if (contactForm) {
+      contactForm.addEventListener('submit', function () {
+        if (typeof fbq !== 'undefined') {
+          fbq('track', 'Lead');
+          console.log('Meta Pixel: Lead event fired on contact form submission');
+        } else {
+          console.log('Meta Pixel: fbq not loaded, Lead event not fired');
+        }
+      });
+    }
+  });
+</script>
+
 {% schema %}
 {
   "name": "t:sections.contact-form.name",
