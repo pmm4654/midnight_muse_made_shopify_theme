@@ -289,6 +289,29 @@ window.pauseCampaign = async function (id) {
 // ============================================================
 
 let chatHistory = [];
+let chatSending = false;
+const CHAT_STORAGE_KEY = 'meta_ads_manager_chat_history';
+const CHAT_HISTORY_LIMIT = 40;
+
+function loadChatHistory() {
+  try {
+    const raw = localStorage.getItem(CHAT_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((m) => m && typeof m.role === 'string' && typeof m.content === 'string');
+  } catch (e) {
+    return [];
+  }
+}
+
+function persistChatHistory() {
+  try {
+    const trimmed = chatHistory.slice(-CHAT_HISTORY_LIMIT);
+    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(trimmed));
+  } catch (e) {
+    // Ignore storage errors (quota, blocked, etc.)
+  }
+}
 
 function renderAssistant() {
   const app = document.getElementById('app');
@@ -298,6 +321,32 @@ function renderAssistant() {
   const input = document.getElementById('chat-input');
   const sendBtn = document.getElementById('btn-send-chat');
   const messagesEl = document.getElementById('chat-messages');
+  const quickActionsEl = document.getElementById('quick-actions');
+
+  chatSending = false;
+
+  // New chat button — clears conversation history
+  document.getElementById('btn-new-chat').addEventListener('click', () => {
+    chatHistory = [];
+    persistChatHistory();
+    messagesEl.innerHTML = document.getElementById('tmpl-assistant').content
+      .querySelector('#chat-messages').innerHTML;
+    quickActionsEl.style.display = '';
+  });
+
+  // Restore prior chat history from local storage
+  chatHistory = loadChatHistory();
+  if (chatHistory.length > 0) {
+    messagesEl.innerHTML = '';
+    chatHistory.forEach((m) => {
+      if (m.role === 'assistant') {
+        addMessage('assistant', renderMarkdown(m.content));
+      } else {
+        addMessage('user', m.content);
+      }
+    });
+    quickActionsEl.style.display = 'none';
+  }
 
   input.addEventListener('input', () => {
     input.style.height = 'auto';
@@ -329,14 +378,19 @@ function renderAssistant() {
 
   async function sendMessage() {
     const text = input.value.trim();
-    if (!text) return;
+    if (!text || chatSending) return;
+
+    chatSending = true;
+    sendBtn.disabled = true;
+    input.disabled = true;
 
     addMessage('user', text);
     chatHistory.push({ role: 'user', content: text });
+    persistChatHistory();
     input.value = '';
     input.style.height = 'auto';
 
-    document.getElementById('quick-actions').style.display = 'none';
+    quickActionsEl.style.display = 'none';
 
     const typingEl = addMessage('assistant', '<div class="loading">Thinking<div class="loading-dots"><span></span><span></span><span></span></div></div>', true);
 
@@ -348,17 +402,25 @@ function renderAssistant() {
       });
 
       typingEl.remove();
-      const content = response.content || 'I encountered an issue. Please try again.';
+      const content = response.content || response.error || 'I encountered an issue. Please try again.';
       chatHistory.push({ role: 'assistant', content });
+      persistChatHistory();
       const msgEl = addMessage('assistant', renderMarkdown(content));
 
       const spec = extractSpecFromResponse(content);
       if (spec) addSpecPreview(msgEl, spec);
     } catch (err) {
       typingEl.remove();
-      addMessage('assistant', `<div class="alert alert-danger">Error: ${err.message}. Check your Claude API connection in <a href="#/settings">Settings</a>.</div>`, true);
+      const errorContent = `Sorry, I encountered an error: ${err.message}. Please try again.`;
+      chatHistory.push({ role: 'assistant', content: errorContent });
+      persistChatHistory();
+      addMessage('assistant', `<div class="alert alert-danger">${errorContent} Check your Claude API connection in <a href="#/settings">Settings</a>.</div>`, true);
     }
 
+    chatSending = false;
+    sendBtn.disabled = false;
+    input.disabled = false;
+    input.focus();
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
@@ -406,8 +468,10 @@ function renderAssistant() {
           btn.textContent = 'Created!';
           btn.className = 'btn btn-outline';
           chatHistory.push({ role: 'user', content: 'I approved the campaign spec. Please confirm what was created.' });
+          persistChatHistory();
           const confirmText = `Your campaign has been created as a **draft** (PAUSED status). Here's what was set up:\n\n- **Campaign ID**: ${result.results.campaign?.id}\n- **Ad Sets Created**: ${result.results.ad_sets?.length || 0}\n- **Ads Created**: ${result.results.ads?.length || 0}\n\nThe campaign is paused and won't spend any money until you activate it. You can review it in the [Campaigns](#/campaigns) tab, or ask me to activate it when you're ready.`;
           chatHistory.push({ role: 'assistant', content: confirmText });
+          persistChatHistory();
           addMessage('assistant', renderMarkdown(confirmText));
         } else {
           btn.textContent = 'Failed - Try Again'; btn.disabled = false;
@@ -551,6 +615,7 @@ function renderSettings() {
       ['SHOPIFY_CLIENT_ID', s.shopify?.client_id],
       ['SHOPIFY_API_KEY', s.shopify?.api_key],
       ['ANTHROPIC_API_KEY', s.claude?.api_key],
+      ['ANTHROPIC_BASE_URL', s.claude?.base_url],
     ];
     el.innerHTML = vars.map(([name, isSet]) =>
       `<div class="flex gap-1 mb-1" style="align-items:center;font-size:0.85rem;">
@@ -559,6 +624,12 @@ function renderSettings() {
         <span class="text-muted">${isSet ? 'configured' : 'not set'}</span>
       </div>`
     ).join('');
+
+    const modeEl = document.getElementById('claude-auth-mode');
+    if (modeEl) {
+      const mode = s.claude?.auth_mode || 'unknown';
+      modeEl.textContent = `Claude auth mode: ${mode}`;
+    }
   });
 }
 

@@ -113,4 +113,14 @@ router.get('/test', async (req, res) => {
   }
 });
 
+// Test local proxy (Claude SDK route)
+router.get('/proxy-health', async (req, res) => {
+  try {
+    const result = await claudeAi.testProxyHealth();
+    res.json(result);
+  } catch (err) {
+    res.json({ ok: false, configured: false, error: err.message });
+  }
+});
+
 module.exports = router;

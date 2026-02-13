@@ -6,9 +6,10 @@
  * and store metadata.
  *
  * Required env vars:
- *   SHOPIFY_CLIENT_ID    — Shopify app client ID
- *   SHOPIFY_API_KEY      — Admin API access token (shpat_xxx)
- *   SHOPIFY_STORE_DOMAIN — your-store.myshopify.com
+ *   SHOPIFY_CLIENT_ID      — Shopify app client ID
+ *   SHOPIFY_CLIENT_SECRET  — Shopify app client secret (shpss_xxx)
+ *   SHOPIFY_ACCESS_TOKEN   — Admin API access token (shpat_xxx, obtained via OAuth)
+ *   SHOPIFY_STORE_DOMAIN   — your-store.myshopify.com
  */
 const fetch = require('node-fetch');
 
@@ -19,7 +20,7 @@ function storeDomain() {
 function adminHeaders() {
   return {
     'Content-Type': 'application/json',
-    'X-Shopify-Access-Token': process.env.SHOPIFY_API_KEY,
+    'X-Shopify-Access-Token': process.env.SHOPIFY_ACCESS_TOKEN,
   };
 }
 
@@ -85,7 +86,13 @@ async function getShopInfo() {
   const res = await fetch(adminUrl('shop.json'), {
     headers: adminHeaders(),
   });
+  if (!res.ok) {
+    throw new Error(`Shopify API returned ${res.status}: ${res.statusText}`);
+  }
   const data = await res.json();
+  if (!data.shop) {
+    throw new Error('Shopify API returned no shop data — check your SHOPIFY_ACCESS_TOKEN and SHOPIFY_STORE_DOMAIN');
+  }
   return data.shop;
 }
 

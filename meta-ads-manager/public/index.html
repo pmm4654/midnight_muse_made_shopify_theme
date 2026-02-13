@@ -243,8 +243,13 @@ SHOPIFY_API_KEY=shpat_xxxxxxxxxxxxx</code></pre>
       <main class="main-content" style="padding:0;">
         <div class="chat-container" style="padding: 0 2rem;">
           <div class="page-header" style="padding-top:2rem;">
-            <h2>AI Campaign Assistant</h2>
-            <p>Describe what you want in plain English. I'll suggest campaigns, explain them, and set them up for you.</p>
+            <div class="flex-between">
+              <div>
+                <h2>AI Campaign Assistant</h2>
+                <p>Describe what you want in plain English. I'll suggest campaigns, explain them, and set them up for you.</p>
+              </div>
+              <button class="btn btn-sm btn-outline" id="btn-new-chat" title="Start a new conversation">New Chat</button>
+            </div>
           </div>
 
           <div class="chat-quick-actions" id="quick-actions">
@@ -395,6 +400,7 @@ SHOPIFY_API_KEY=shpat_xxxxxxxxxxxxx</code></pre>
         <div class="card">
           <h3>Environment Variables</h3>
           <p class="text-muted mb-1">Credentials are managed exclusively through environment variables. Update your <code>.env</code> file or shell environment, then restart the server.</p>
+          <p class="text-muted mb-1" id="claude-auth-mode">Claude auth mode: checking...</p>
           <div id="env-var-status" class="mt-1"></div>
         </div>
 

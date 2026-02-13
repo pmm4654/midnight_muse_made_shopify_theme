@@ -6,14 +6,68 @@
  * builds campaign specs, and assesses performance.
  */
 const Anthropic = require('@anthropic-ai/sdk');
+const fetch = require('node-fetch');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 let client = null;
 
+/**
+ * Read Claude Code CLI OAuth credentials from ~/.claude/.credentials.json
+ * Returns the access token if valid, or null.
+ */
+function getClaudeCliToken() {
+  try {
+    const credPath = path.join(os.homedir(), '.claude', '.credentials.json');
+    const creds = JSON.parse(fs.readFileSync(credPath, 'utf-8'));
+    const oauth = creds.claudeAiOauth;
+    if (!oauth || !oauth.accessToken) return null;
+
+    if (oauth.expiresAt && Date.now() > oauth.expiresAt) {
+      console.warn('  Claude Code CLI token has expired. Run "claude" to refresh it.');
+      return null;
+    }
+
+    return oauth.accessToken;
+  } catch {
+    return null;
+  }
+}
+
 function getClient() {
   if (!client) {
-    client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const apiKey = (process.env.ANTHROPIC_API_KEY || '').trim();
+    const baseURL = (process.env.ANTHROPIC_BASE_URL || '').trim();
+
+    if (apiKey) {
+      client = baseURL ? new Anthropic({ apiKey, baseURL }) : new Anthropic({ apiKey });
+    } else {
+      const cliToken = getClaudeCliToken();
+      if (baseURL) {
+        // Local proxy mode (Anthropic-compatible). Provide a dummy key to satisfy SDK auth checks.
+        client = new Anthropic({ apiKey: 'local-proxy', baseURL });
+        console.log(`  Using local Anthropic proxy at ${baseURL}.`);
+      } else if (cliToken) {
+        client = new Anthropic({ apiKey: null, authToken: cliToken });
+        console.log('  Using Claude Code CLI authentication (OAuth token).');
+      } else {
+        // Let the SDK throw its own error on first use
+        client = new Anthropic();
+      }
+    }
   }
   return client;
+}
+
+function normalizeBaseUrl(url) {
+  return url ? url.replace(/\/+$/, '') : '';
+}
+
+function resolveSdkBaseUrl() {
+  const base = normalizeBaseUrl(process.env.ANTHROPIC_BASE_URL || '');
+  if (!base) return '';
+  return base.endsWith('/claude/sdk') ? base : `${base}/claude/sdk`;
 }
 
 const SYSTEM_PROMPT = `You are an expert Meta (Facebook/Instagram) advertising strategist and campaign manager integrated into a Shopify store's ad management tool.
@@ -90,6 +144,39 @@ Always provide specific, actionable next steps — never vague advice.`;
 
 // ---------- Chat with AI ----------
 
+/**
+ * Sanitize messages to ensure valid alternating user/assistant format.
+ * The Claude API requires messages to alternate between user and assistant
+ * roles, starting with user. Consecutive same-role messages are merged.
+ */
+function sanitizeMessages(messages) {
+  if (!Array.isArray(messages) || messages.length === 0) return [];
+
+  const cleaned = messages
+    .filter((m) => m && typeof m.role === 'string' && typeof m.content === 'string' && m.content.trim())
+    .map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+
+  if (cleaned.length === 0) return [];
+
+  // Merge consecutive same-role messages
+  const merged = [cleaned[0]];
+  for (let i = 1; i < cleaned.length; i++) {
+    const prev = merged[merged.length - 1];
+    if (cleaned[i].role === prev.role) {
+      prev.content += '\n\n' + cleaned[i].content;
+    } else {
+      merged.push(cleaned[i]);
+    }
+  }
+
+  // Ensure first message is from user
+  if (merged[0].role !== 'user') {
+    merged.unshift({ role: 'user', content: 'Hello' });
+  }
+
+  return merged;
+}
+
 async function chat(messages, storeContext = null, campaignContext = null) {
   const anthropic = getClient();
 
@@ -106,14 +193,13 @@ async function chat(messages, storeContext = null, campaignContext = null) {
     ? `${SYSTEM_PROMPT}\n\nCurrent context:\n${contextParts.join('\n\n')}`
     : SYSTEM_PROMPT;
 
+  const sanitized = sanitizeMessages(messages);
+
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 4096,
     system: systemMessage,
-    messages: messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    })),
+    messages: sanitized,
   });
 
   return {
@@ -199,10 +285,55 @@ async function testConnection() {
   }
 }
 
+// ---------- Proxy health ----------
+
+async function testProxyHealth() {
+  const sdkBase = resolveSdkBaseUrl();
+  if (!sdkBase) {
+    return { ok: false, configured: false, error: 'ANTHROPIC_BASE_URL not set' };
+  }
+
+  const url = `${sdkBase}/v1/messages`;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': 'local-proxy',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8,
+        messages: [{ role: 'user', content: 'ping' }],
+      }),
+    });
+
+    const text = await res.text();
+    if (!res.ok) {
+      return { ok: false, configured: true, status: res.status, error: text, base_url: sdkBase };
+    }
+
+    // Detect CCProxy header-capture mock response
+    if (text.includes('Test response')) {
+      return {
+        ok: false,
+        configured: true,
+        error: 'Proxy returned mock response (likely wrong route). Expected /claude/sdk.',
+        base_url: sdkBase,
+      };
+    }
+
+    return { ok: true, configured: true, base_url: sdkBase };
+  } catch (err) {
+    return { ok: false, configured: true, error: err.message, base_url: sdkBase };
+  }
+}
+
 module.exports = {
   chat,
   suggestCampaign,
   assessPerformance,
   extractCampaignSpec,
   testConnection,
+  testProxyHealth,
 };

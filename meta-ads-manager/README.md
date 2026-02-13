@@ -34,6 +34,7 @@ SHOPIFY_API_KEY=shpat_xxxxxxxxxxxxx
 
 # Anthropic Claude API
 ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxx
+ANTHROPIC_BASE_URL=http://localhost:8888
 
 # Optional
 PORT=3456
@@ -70,6 +71,10 @@ APP_URL=http://localhost:3456
 1. Go to [console.anthropic.com](https://console.anthropic.com/)
 2. Create an API key → set as `ANTHROPIC_API_KEY`
 
+**Local proxy (optional):**
+If you run an Anthropic-compatible local proxy (e.g., CCProxy API), set:
+`ANTHROPIC_BASE_URL=http://localhost:PORT` and leave `ANTHROPIC_API_KEY` empty.
+
 ## Installation & Startup
 
 ```bash
@@ -78,6 +83,20 @@ cp .env.example .env   # Edit with your credentials
 npm install
 npm start              # http://localhost:3456
 ```
+
+### Start with Local Proxy (Claude Code / CCProxy SDK)
+
+If you want to use a local Anthropic-compatible proxy (CCProxy SDK mode), run:
+
+```bash
+npm run start:proxy
+```
+
+This script will:
+- Start CCProxy if it's not running
+- Discover the proxy port automatically
+- Export `ANTHROPIC_BASE_URL` (SDK route) and `ANTHROPIC_API_KEY=local-proxy`
+- Start the app
 
 The setup wizard at `/#/setup` shows which env vars are set, explains how to obtain each credential, and lets you test each connection.
 

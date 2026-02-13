@@ -6,6 +6,7 @@
  * (draft mode) so nothing goes live without explicit approval.
  */
 const fetch = require('node-fetch');
+const crypto = require('crypto');
 
 const BASE = 'https://graph.facebook.com';
 
@@ -32,9 +33,16 @@ function adAccountId() {
 
 // ---------- Generic request helper ----------
 
+function appSecretProof() {
+  return crypto
+    .createHmac('sha256', process.env.FACEBOOK_APP_SECRET)
+    .update(token())
+    .digest('hex');
+}
+
 async function metaRequest(method, endpoint, body = null) {
   const separator = endpoint.includes('?') ? '&' : '?';
-  const fullUrl = `${url(endpoint)}${separator}access_token=${token()}`;
+  const fullUrl = `${url(endpoint)}${separator}access_token=${token()}&appsecret_proof=${appSecretProof()}`;
 
   const opts = { method, headers: headers() };
   if (body && method !== 'GET') {

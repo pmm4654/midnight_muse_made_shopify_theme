@@ -13,8 +13,32 @@ function isSet(name) {
   return !!(process.env[name] && process.env[name].trim());
 }
 
+function hasClaudeCliAuth() {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const os = require('os');
+    const credPath = path.join(os.homedir(), '.claude', '.credentials.json');
+    const creds = JSON.parse(fs.readFileSync(credPath, 'utf-8'));
+    return !!creds.claudeAiOauth?.accessToken;
+  } catch {
+    return false;
+  }
+}
+
 // GET /api/settings — returns which services are configured (no secrets exposed)
 router.get('/', (req, res) => {
+  const hasProxy = isSet('ANTHROPIC_BASE_URL');
+  const hasApiKey = isSet('ANTHROPIC_API_KEY');
+  const hasCli = hasClaudeCliAuth();
+  const claudeMode = hasApiKey
+    ? 'api_key'
+    : hasProxy
+      ? 'local_proxy'
+      : hasCli
+        ? 'cli_oauth'
+        : 'unconfigured';
+
   res.json({
     facebook: {
       app_id: isSet('FACEBOOK_APP_ID'),
@@ -29,11 +53,13 @@ router.get('/', (req, res) => {
     },
     claude: {
       api_key: isSet('ANTHROPIC_API_KEY'),
+      base_url: isSet('ANTHROPIC_BASE_URL'),
+      auth_mode: claudeMode,
     },
     configured: {
       facebook: isSet('FACEBOOK_APP_ID') && isSet('FACEBOOK_APP_SECRET') && isSet('FACEBOOK_AD_ACCOUNT_ID') && isSet('FACEBOOK_ACCESS_TOKEN'),
       shopify: isSet('SHOPIFY_CLIENT_ID') && isSet('SHOPIFY_API_KEY') && isSet('SHOPIFY_STORE_DOMAIN'),
-      claude: isSet('ANTHROPIC_API_KEY'),
+      claude: hasApiKey || hasProxy || hasCli,
     },
   });
 });

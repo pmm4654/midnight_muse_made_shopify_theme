@@ -39,9 +39,32 @@ app.listen(PORT, () => {
   if (!process.env.FACEBOOK_AD_ACCOUNT_ID) missing.push('FACEBOOK_AD_ACCOUNT_ID');
   if (!process.env.FACEBOOK_ACCESS_TOKEN) missing.push('FACEBOOK_ACCESS_TOKEN');
   if (!process.env.SHOPIFY_CLIENT_ID) missing.push('SHOPIFY_CLIENT_ID');
-  if (!process.env.SHOPIFY_API_KEY) missing.push('SHOPIFY_API_KEY');
+  if (!process.env.SHOPIFY_CLIENT_SECRET) missing.push('SHOPIFY_CLIENT_SECRET');
   if (!process.env.SHOPIFY_STORE_DOMAIN) missing.push('SHOPIFY_STORE_DOMAIN');
-  if (!process.env.ANTHROPIC_API_KEY) missing.push('ANTHROPIC_API_KEY');
+  if (!process.env.SHOPIFY_ACCESS_TOKEN) {
+    console.log('  SHOPIFY_ACCESS_TOKEN not set — visit /api/shopify/auth to connect your store.');
+  }
+  if (!process.env.ANTHROPIC_API_KEY) {
+    if (process.env.ANTHROPIC_BASE_URL) {
+      console.log('  ANTHROPIC_API_KEY not set — using local Anthropic proxy.');
+    } else {
+    // Check for Claude Code CLI auth as fallback
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const os = require('os');
+      const credPath = path.join(os.homedir(), '.claude', '.credentials.json');
+      const creds = JSON.parse(fs.readFileSync(credPath, 'utf-8'));
+      if (creds.claudeAiOauth?.accessToken) {
+        console.log('  ANTHROPIC_API_KEY not set — will use Claude Code CLI auth.');
+      } else {
+        missing.push('ANTHROPIC_API_KEY');
+      }
+    } catch {
+      missing.push('ANTHROPIC_API_KEY');
+    }
+    }
+  }
 
   if (missing.length) {
     console.log('  Missing env vars (set these before using the app):');
