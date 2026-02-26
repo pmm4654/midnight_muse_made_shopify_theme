@@ -1,0 +1,220 @@
+{{ 'section-main-page.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .discount-gate__hidden {
+    display: none;
+  }
+
+  .discount-gate__placeholder {
+    background: rgba(var(--color-foreground), 0.04);
+    border: 2px dashed rgba(var(--color-foreground), 0.15);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin: 1.5rem 0;
+  }
+
+  .discount-gate__placeholder p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.8;
+  }
+
+  .discount-gate__revealed {
+    animation: discountReveal 0.5s ease-out;
+  }
+
+  @keyframes discountReveal {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+{%- endstyle -%}
+
+<div class="page-width page-width--narrow section-{{ section.id }}-padding">
+  <h1 class="main-page-title page-title h0{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+    {{ page.title | escape }}
+  </h1>
+  <div class="rte{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" id="gated-page-content">
+    {{ page.content }}
+  </div>
+</div>
+
+<script>
+  (function run() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run);
+      return;
+    }
+    var STORAGE_KEY = 'discount_gate_subscribed';
+    var content = document.getElementById('gated-page-content');
+    if (!content) return;
+
+    var alreadySubscribed = false;
+    try { alreadySubscribed = localStorage.getItem(STORAGE_KEY) === 'true'; } catch(e) {}
+
+    if (alreadySubscribed) return;
+
+    // The CMS content has a known structure:
+    // - A div with the FIRST13 button (the discount code block with purple bg)
+    // - An h3 "How It Works" followed by a div containing an ol
+    var codeButton = content.querySelector('button');
+    var elementsToHide = [];
+
+    // Find the discount code block: the div containing the button
+    if (codeButton) {
+      var discountBlock = codeButton.parentElement;
+      if (discountBlock) {
+        elementsToHide.push(discountBlock);
+      }
+    }
+
+    // Find "How It Works" heading and its list
+    content.querySelectorAll('h3').forEach(function(h3) {
+      if (h3.textContent.trim() === 'How It Works') {
+        elementsToHide.push(h3);
+        var next = h3.nextElementSibling;
+        if (next) elementsToHide.push(next);
+      }
+    });
+
+    if (elementsToHide.length === 0) return;
+
+    // Hide elements
+    elementsToHide.forEach(function(el) {
+      el.classList.add('discount-gate__hidden');
+    });
+
+    // Insert placeholder where the discount block was
+    var firstHidden = elementsToHide[0];
+    var placeholder = document.createElement('div');
+    placeholder.className = 'discount-gate__placeholder';
+    placeholder.id = 'discount-gate-placeholder';
+    placeholder.innerHTML = '<p><strong>Subscribe below to reveal your exclusive discount code!</strong></p>';
+    firstHidden.parentNode.insertBefore(placeholder, firstHidden);
+
+    function revealDiscount() {
+      try { localStorage.setItem(STORAGE_KEY, 'true'); } catch(e) {}
+
+      var ph = document.getElementById('discount-gate-placeholder');
+      if (ph) ph.remove();
+
+      content.querySelectorAll('.discount-gate__hidden').forEach(function(el) {
+        el.classList.remove('discount-gate__hidden');
+        el.classList.add('discount-gate__revealed');
+      });
+    }
+
+    // Strategy 1: MutationObserver watching for Shopify Forms success state
+    var revealed = false;
+    var observer = new MutationObserver(function(mutations) {
+      if (revealed) return;
+      for (var i = 0; i < mutations.length; i++) {
+        var mutation = mutations[i];
+        // Check added nodes for success/thank you messages from the forms app
+        for (var j = 0; j < mutation.addedNodes.length; j++) {
+          var node = mutation.addedNodes[j];
+          if (node.nodeType === 1 && node.textContent && node.textContent.match(/thank\s*you|success|submitted|confirmed/i)) {
+            revealed = true;
+            revealDiscount();
+            observer.disconnect();
+            return;
+          }
+        }
+        // Check attribute changes (Shopify Forms may toggle visibility classes)
+        if (mutation.type === 'attributes' && mutation.target.nodeType === 1) {
+          var el = mutation.target;
+          if (el.textContent && el.textContent.match(/thank\s*you|success|submitted|confirmed/i)) {
+            var style = window.getComputedStyle(el);
+            if (style.display !== 'none' && style.visibility !== 'hidden') {
+              revealed = true;
+              revealDiscount();
+              observer.disconnect();
+              return;
+            }
+          }
+        }
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style', 'hidden']
+    });
+
+    // Strategy 2: Listen for postMessage from Shopify Forms iframe
+    window.addEventListener('message', function(event) {
+      if (revealed) return;
+      try {
+        var data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data && (data.type === 'form_submitted' || data.type === 'form_success' ||
+            data.event === 'form_submitted' || data.submitted === true)) {
+          revealed = true;
+          revealDiscount();
+        }
+      } catch(e) {}
+    });
+
+    // Strategy 3: Poll for form completion (fallback for cross-origin iframes)
+    var pollCount = 0;
+    var pollInterval = setInterval(function() {
+      if (revealed || ++pollCount > 300) { clearInterval(pollInterval); return; }
+      // Check if any visible element on the page now says "thank you" or similar
+      var appBlocks = document.querySelectorAll('.shopify-app-block, [id*="forms"]');
+      appBlocks.forEach(function(block) {
+        if (block.textContent.match(/thank\s*you|success|submitted/i)) {
+          revealed = true;
+          revealDiscount();
+          clearInterval(pollInterval);
+        }
+      });
+    }, 2000);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Gated Discount Page",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ]
+}
+{% endschema %}
