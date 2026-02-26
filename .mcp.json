@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "shopify-store": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "shopify-mcp",
+        "--accessToken",
+        "${SHOPIFY_ACCESS_TOKEN}",
+        "--domain",
+        "${SHOPIFY_STORE_DOMAIN}"
+      ]
+    },
+    "shopify-dev": {
+      "command": "npx",
+      "args": ["-y", "@shopify/dev-mcp@latest"]
+    }
+  }
+}
