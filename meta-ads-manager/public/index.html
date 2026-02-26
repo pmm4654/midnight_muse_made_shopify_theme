@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta Ads Manager &mdash; AI-Powered</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- ========== TEMPLATES ========== -->
+
+  <!-- Setup Wizard (instructional — no secret entry, env-var-driven) -->
+  <template id="tmpl-setup">
+    <div class="app-shell no-sidebar">
+      <div class="main-content">
+        <div class="wizard-container">
+          <div class="wizard-header">
+            <h1>Meta Ads Manager Setup</h1>
+            <p>Configure your environment variables, then verify each connection below.</p>
+          </div>
+
+          <!-- Steps indicator -->
+          <div class="wizard-steps">
+            <div class="wizard-step" data-step="1">
+              <span class="step-number">1</span>
+              <span class="step-label">Facebook Ads</span>
+            </div>
+            <div class="wizard-connector" data-connector="1"></div>
+            <div class="wizard-step" data-step="2">
+              <span class="step-number">2</span>
+              <span class="step-label">Shopify</span>
+            </div>
+            <div class="wizard-connector" data-connector="2"></div>
+            <div class="wizard-step" data-step="3">
+              <span class="step-number">3</span>
+              <span class="step-label">Claude AI</span>
+            </div>
+          </div>
+
+          <!-- Step 1: Facebook -->
+          <div class="wizard-panel" data-panel="1">
+            <div class="card">
+              <h3>Connect Facebook Ads</h3>
+              <p class="text-muted mb-2">Set these environment variables before starting the server. They are never entered through this web interface.</p>
+
+              <div class="alert alert-info mb-2">
+                <div>
+                  <strong>Required environment variables:</strong>
+                  <pre style="background:var(--color-bg);padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.82rem;line-height:1.7;overflow-x:auto;"><code>FACEBOOK_APP_ID=your_app_id
+FACEBOOK_APP_SECRET=your_app_secret
+FACEBOOK_AD_ACCOUNT_ID=act_123456789
+FACEBOOK_ACCESS_TOKEN=your_long_lived_token</code></pre>
+                </div>
+              </div>
+
+              <div class="alert alert-warning mb-2">
+                <div>
+                  <strong>How to obtain these values:</strong>
+                  <ol style="margin-top:0.5rem; padding-left:1.25rem;">
+                    <li>Create a <a href="https://business.facebook.com/" target="_blank">Meta Business Suite</a> account with an Ad Account</li>
+                    <li>Create a developer app at <a href="https://developers.facebook.com/apps/" target="_blank">developers.facebook.com/apps</a> (type: Business, add Marketing API)</li>
+                    <li>Copy <strong>App ID</strong> and <strong>App Secret</strong> from Settings &rarr; Basic</li>
+                    <li>Find your <strong>Ad Account ID</strong> (with <code>act_</code> prefix) in Business Settings &rarr; Ad Accounts</li>
+                    <li>Get an access token via the <a href="https://developers.facebook.com/tools/explorer/" target="_blank">Graph API Explorer</a> with scopes: <code>ads_management</code>, <code>ads_read</code>, <code>business_management</code></li>
+                  </ol>
+                </div>
+              </div>
+
+              <p class="text-sm text-muted mb-1"><strong>Alternative:</strong> If <code>FACEBOOK_APP_ID</code> and <code>FACEBOOK_APP_SECRET</code> are set, you can use Facebook OAuth to generate a token:</p>
+              <button class="btn btn-meta" id="btn-meta-oauth">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Generate Token via Facebook Login
+              </button>
+
+              <div id="oauth-token-display" class="hidden mt-2">
+                <div class="alert alert-success">
+                  <div>
+                    <strong>Token generated!</strong> Add this to your environment and restart the server:
+                    <pre style="background:var(--color-bg);padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.82rem;overflow-x:auto;word-break:break-all;"><code id="oauth-token-value"></code></pre>
+                    <p class="text-sm" style="margin-top:0.5rem;">The token has been applied to this session. For persistence, add it to your <code>.env</code> file or shell environment.</p>
+                  </div>
+                </div>
+              </div>
+
+              <hr style="border-color:var(--color-border); margin:1.5rem 0;">
+
+              <h4 style="font-size:0.95rem;" class="mb-1">Verify Connection</h4>
+              <div id="meta-env-status" class="mb-1"></div>
+              <button class="btn btn-outline" id="btn-meta-test">Test Facebook Connection</button>
+              <div id="meta-test-result" class="mt-1"></div>
+            </div>
+          </div>
+
+          <!-- Step 2: Shopify -->
+          <div class="wizard-panel hidden" data-panel="2">
+            <div class="card">
+              <h3>Connect Your Shopify Store</h3>
+              <p class="text-muted mb-2">Set these environment variables so the AI can analyze your products, collections, and sales data.</p>
+
+              <div class="alert alert-info mb-2">
+                <div>
+                  <strong>Required environment variables:</strong>
+                  <pre style="background:var(--color-bg);padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.82rem;line-height:1.7;overflow-x:auto;"><code>SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
+SHOPIFY_CLIENT_ID=your_app_client_id
+SHOPIFY_API_KEY=shpat_xxxxxxxxxxxxx</code></pre>
+                </div>
+              </div>
+
+              <div class="alert alert-warning mb-2">
+                <div>
+                  <strong>How to obtain these values:</strong>
+                  <ol style="margin-top:0.5rem; padding-left:1.25rem;">
+                    <li>In Shopify Admin, go to <strong>Settings &rarr; Apps and sales channels</strong></li>
+                    <li>Click <strong>Develop apps</strong> (enable developer mode if prompted)</li>
+                    <li>Click <strong>Create an app</strong>, name it "Meta Ads Manager"</li>
+                    <li>Configure <strong>Admin API scopes</strong>: <code>read_products</code>, <code>read_orders</code>, <code>read_customers</code></li>
+                    <li>Install the app and copy the <strong>Admin API access token</strong> (starts with <code>shpat_</code>)</li>
+                    <li><code>SHOPIFY_STORE_DOMAIN</code> = your store's <code>.myshopify.com</code> domain</li>
+                    <li><code>SHOPIFY_CLIENT_ID</code> = the app's client ID from the API credentials page</li>
+                    <li><code>SHOPIFY_API_KEY</code> = the Admin API access token you copied</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div id="shopify-env-status" class="mb-1"></div>
+              <button class="btn btn-outline" id="btn-shopify-test" style="background: var(--color-shopify-green); color: #333; border-color: var(--color-shopify-green);">Test Shopify Connection</button>
+              <div id="shopify-test-result" class="mt-1"></div>
+            </div>
+          </div>
+
+          <!-- Step 3: Claude AI -->
+          <div class="wizard-panel hidden" data-panel="3">
+            <div class="card">
+              <h3>Connect Claude AI</h3>
+              <p class="text-muted mb-2">Claude powers the natural language interface — suggesting campaigns, writing ad copy, analyzing performance, and managing ads through conversation.</p>
+
+              <div class="alert alert-info mb-2">
+                <div>
+                  <strong>Required environment variable:</strong>
+                  <pre style="background:var(--color-bg);padding:0.75rem;border-radius:6px;margin-top:0.5rem;font-size:0.82rem;line-height:1.7;overflow-x:auto;"><code>ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxx</code></pre>
+                </div>
+              </div>
+
+              <div class="alert alert-warning mb-2">
+                <div>
+                  <strong>How to get your API key:</strong>
+                  <ol style="margin-top:0.5rem; padding-left:1.25rem;">
+                    <li>Go to <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></li>
+                    <li>Sign up or log in</li>
+                    <li>Navigate to <strong>API Keys</strong></li>
+                    <li>Click <strong>Create Key</strong> and copy it</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div id="claude-env-status" class="mb-1"></div>
+              <button class="btn btn-outline" id="btn-claude-test" style="background: var(--color-claude-orange); color: white; border-color: var(--color-claude-orange);">Test Claude Connection</button>
+              <div id="claude-test-result" class="mt-1"></div>
+            </div>
+
+            <div class="card mt-2">
+              <h3>Ready to go?</h3>
+              <p class="text-muted">Once all three services show as connected, click "Finish Setup" to start managing your ads with AI.</p>
+            </div>
+          </div>
+
+          <!-- Wizard navigation -->
+          <div class="wizard-actions">
+            <button class="btn btn-outline" id="btn-wizard-back" disabled>Back</button>
+            <div class="flex gap-1">
+              <button class="btn btn-outline" id="btn-wizard-skip">Skip</button>
+              <button class="btn btn-primary" id="btn-wizard-next">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Dashboard -->
+  <template id="tmpl-dashboard">
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div class="page-header">
+          <h2>Dashboard</h2>
+          <p>Overview of your Meta advertising performance</p>
+        </div>
+
+        <div class="card-grid" id="stats-grid">
+          <div class="stat-card">
+            <div class="label">Total Spend</div>
+            <div class="value" id="stat-spend">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Impressions</div>
+            <div class="value" id="stat-impressions">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Clicks</div>
+            <div class="value" id="stat-clicks">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">CTR</div>
+            <div class="value" id="stat-ctr">--</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Campaigns</h3>
+            <div class="flex gap-1">
+              <button class="btn btn-sm btn-outline" id="btn-refresh-campaigns">Refresh</button>
+              <button class="btn btn-sm btn-primary" id="btn-new-campaign">+ New Campaign</button>
+            </div>
+          </div>
+          <div id="campaigns-list">
+            <div class="empty-state">
+              <h3>Loading campaigns...</h3>
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>AI Quick Actions</h3></div>
+          <div class="card-grid">
+            <button class="btn btn-outline btn-block" onclick="window.location.hash='#/assistant?action=suggest'">Suggest a new campaign</button>
+            <button class="btn btn-outline btn-block" onclick="window.location.hash='#/assistant?action=assess'">Assess campaign performance</button>
+            <button class="btn btn-outline btn-block" onclick="window.location.hash='#/assistant'">Chat with AI assistant</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </template>
+
+  <!-- AI Assistant -->
+  <template id="tmpl-assistant">
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content" style="padding:0;">
+        <div class="chat-container" style="padding: 0 2rem;">
+          <div class="page-header" style="padding-top:2rem;">
+            <div class="flex-between">
+              <div>
+                <h2>AI Campaign Assistant</h2>
+                <p>Describe what you want in plain English. I'll suggest campaigns, explain them, and set them up for you.</p>
+              </div>
+              <button class="btn btn-sm btn-outline" id="btn-new-chat" title="Start a new conversation">New Chat</button>
+            </div>
+          </div>
+
+          <div class="chat-quick-actions" id="quick-actions">
+            <button class="quick-action" data-prompt="Suggest a campaign to drive traffic to my best-selling products">Drive traffic to best sellers</button>
+            <button class="quick-action" data-prompt="Create a retargeting campaign for people who visited my store but didn't purchase">Retarget store visitors</button>
+            <button class="quick-action" data-prompt="Suggest a brand awareness campaign for my store on Instagram">Instagram brand awareness</button>
+            <button class="quick-action" data-prompt="Assess my current campaign performance and suggest improvements">Assess performance</button>
+            <button class="quick-action" data-prompt="What's the best strategy for promoting a new product launch?">New product launch strategy</button>
+            <button class="quick-action" data-prompt="Create a seasonal sale campaign with a 20% discount offer">Seasonal sale campaign</button>
+          </div>
+
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-message assistant">
+              <div class="chat-avatar">AI</div>
+              <div class="chat-bubble">
+                <p>Hello! I'm your AI advertising assistant. I can help you:</p>
+                <ul>
+                  <li><strong>Suggest campaigns</strong> based on your products and goals</li>
+                  <li><strong>Create draft campaigns</strong> with targeting, budget, and ad copy</li>
+                  <li><strong>Assess performance</strong> of your existing campaigns</li>
+                  <li><strong>Optimize and adjust</strong> campaigns based on results</li>
+                </ul>
+                <p>Tell me what you'd like to do, or click one of the quick actions above to get started.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <div class="chat-input-row">
+              <textarea id="chat-input" placeholder="Describe what you want... e.g., 'Create a campaign to promote my summer collection to women aged 25-45 in the US'" rows="1"></textarea>
+              <button class="btn btn-primary" id="btn-send-chat">Send</button>
+            </div>
+            <div class="flex-between mt-1">
+              <label class="text-sm text-muted flex gap-1" style="align-items:center;">
+                <input type="checkbox" id="include-store-data" checked> Include store data for context
+              </label>
+              <label class="text-sm text-muted flex gap-1" style="align-items:center;">
+                <input type="checkbox" id="include-campaign-data" checked> Include campaign data
+              </label>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </template>
+
+  <!-- Campaigns List -->
+  <template id="tmpl-campaigns">
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div class="page-header flex-between">
+          <div>
+            <h2>Campaigns</h2>
+            <p>Manage your Meta ad campaigns</p>
+          </div>
+          <button class="btn btn-primary" id="btn-create-campaign">+ Create Campaign</button>
+        </div>
+        <div class="tabs">
+          <div class="tab active" data-filter="all">All</div>
+          <div class="tab" data-filter="ACTIVE">Active</div>
+          <div class="tab" data-filter="PAUSED">Paused / Draft</div>
+        </div>
+        <div class="card" style="padding:0;">
+          <div id="campaigns-table-container">
+            <div class="empty-state"><h3>Loading...</h3><div class="loading"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </template>
+
+  <!-- Analytics -->
+  <template id="tmpl-analytics">
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div class="page-header flex-between">
+          <div>
+            <h2>Analytics</h2>
+            <p>Campaign performance insights and AI analysis</p>
+          </div>
+          <div class="flex gap-1">
+            <select id="date-range" style="width:auto;">
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="last_7d">Last 7 days</option>
+              <option value="last_30d" selected>Last 30 days</option>
+              <option value="last_90d">Last 90 days</option>
+            </select>
+            <button class="btn btn-primary" id="btn-ai-assess">AI Assessment</button>
+          </div>
+        </div>
+        <div class="card-grid" id="analytics-stats">
+          <div class="stat-card"><div class="label">Total Spend</div><div class="value" id="a-stat-spend">--</div></div>
+          <div class="stat-card"><div class="label">Reach</div><div class="value" id="a-stat-reach">--</div></div>
+          <div class="stat-card"><div class="label">Clicks</div><div class="value" id="a-stat-clicks">--</div></div>
+          <div class="stat-card"><div class="label">CPC</div><div class="value" id="a-stat-cpc">--</div></div>
+        </div>
+        <div class="card hidden" id="ai-assessment-card">
+          <div class="card-header">
+            <h3>AI Performance Assessment</h3>
+            <button class="btn btn-sm btn-outline" id="btn-close-assessment">Close</button>
+          </div>
+          <div id="ai-assessment-content"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Campaign Breakdown</h3></div>
+          <div id="analytics-campaigns-list">
+            <div class="empty-state"><h3>Loading performance data...</h3><div class="loading"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </template>
+
+  <!-- Settings -->
+  <template id="tmpl-settings">
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div class="page-header">
+          <h2>Settings</h2>
+          <p>Connection status and environment configuration</p>
+        </div>
+
+        <div class="card">
+          <h3>Connection Status</h3>
+          <div class="mt-1" id="connection-status">
+            <div class="flex gap-2 mb-1" style="align-items:center;">
+              <span class="status-dot" id="status-meta"></span>
+              <strong>Facebook Ads</strong>
+              <span class="text-muted text-sm" id="status-meta-text">Checking...</span>
+            </div>
+            <div class="flex gap-2 mb-1" style="align-items:center;">
+              <span class="status-dot" id="status-shopify"></span>
+              <strong>Shopify</strong>
+              <span class="text-muted text-sm" id="status-shopify-text">Checking...</span>
+            </div>
+            <div class="flex gap-2 mb-1" style="align-items:center;">
+              <span class="status-dot" id="status-claude"></span>
+              <strong>Claude AI</strong>
+              <span class="text-muted text-sm" id="status-claude-text">Checking...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Environment Variables</h3>
+          <p class="text-muted mb-1">Credentials are managed exclusively through environment variables. Update your <code>.env</code> file or shell environment, then restart the server.</p>
+          <p class="text-muted mb-1" id="claude-auth-mode">Claude auth mode: checking...</p>
+          <div id="env-var-status" class="mt-1"></div>
+        </div>
+
+        <div class="card">
+          <h3>Reconfigure</h3>
+          <p class="text-muted mb-1">Run the setup wizard again to see instructions and verify connections.</p>
+          <button class="btn btn-outline" onclick="window.location.hash='#/setup'">Open Setup Wizard</button>
+        </div>
+      </main>
+    </div>
+  </template>
+
+  <!-- Sidebar partial -->
+  <template id="tmpl-sidebar">
+    <div class="sidebar-logo">
+      <h1>Meta Ads Manager</h1>
+      <span>AI-Powered by Claude</span>
+    </div>
+    <nav>
+      <a class="nav-item" href="#/dashboard" data-route="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#/assistant" data-route="assistant">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        AI Assistant
+      </a>
+      <a class="nav-item" href="#/campaigns" data-route="campaigns">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Campaigns
+      </a>
+      <a class="nav-item" href="#/analytics" data-route="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </a>
+      <a class="nav-item" href="#/settings" data-route="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="text-sm text-muted">
+        <span class="status-dot" id="sidebar-status-dot"></span>
+        <span id="sidebar-status-text">Checking connections...</span>
+      </div>
+    </div>
+  </template>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
