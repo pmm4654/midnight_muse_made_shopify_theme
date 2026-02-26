@@ -2,14 +2,11 @@
   "mcpServers": {
     "shopify-store": {
       "command": "npx",
-      "args": [
-        "-y",
-        "shopify-mcp",
-        "--accessToken",
-        "${SHOPIFY_ACCESS_TOKEN}",
-        "--domain",
-        "${SHOPIFY_STORE_DOMAIN}"
-      ]
+      "args": ["-y", "shopify-mcp"],
+      "env": {
+        "SHOPIFY_ACCESS_TOKEN": "${SHOPIFY_ACCESS_TOKEN}",
+        "MYSHOPIFY_DOMAIN": "${SHOPIFY_STORE_DOMAIN}"
+      }
     },
     "shopify-dev": {
       "command": "npx",
