@@ -132,8 +132,8 @@ Package: `shopify-mcp` — Connects to the Shopify Admin GraphQL API for store o
 
 **Required environment variables:**
 ```bash
-export SHOPIFY_ACCESS_TOKEN="shpat_xxxxx"  # Admin API access token
-export SHOPIFY_STORE_DOMAIN="your-store.myshopify.com"
+export SHOPIFY_ACCESS_TOKEN="shpat_xxxxx"    # Admin API access token
+export SHOPIFY_STORE_DOMAIN="your-store.myshopify.com"  # .mcp.json maps this to MYSHOPIFY_DOMAIN
 ```
 
 **Required Custom App scopes:**
