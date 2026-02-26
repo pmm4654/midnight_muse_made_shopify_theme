@@ -114,3 +114,42 @@ Default language file: `locales/en.default.json`. Use translation keys:
 ```liquid
 {{ 'general.search.placeholder' | t }}
 ```
+
+## Shopify Store Management (MCP)
+
+Two MCP servers are configured in `.mcp.json`:
+
+### shopify-store (Store Management)
+Package: `shopify-mcp` — Connects to the Shopify Admin GraphQL API for store operations.
+
+**Capabilities:**
+- Product CRUD (create, update, delete products, variants, options)
+- Customer management (query, tag, segment)
+- Order management (read, update)
+- Discount code creation (basic codes with usage limits)
+- Collection management
+- Page CRUD via REST Admin API
+
+**Required environment variables:**
+```bash
+export SHOPIFY_ACCESS_TOKEN="shpat_xxxxx"  # Admin API access token
+export SHOPIFY_STORE_DOMAIN="your-store.myshopify.com"
+```
+
+**Required Custom App scopes:**
+`write_products`, `read_products`, `write_content`, `read_content`, `write_discounts`, `read_discounts`, `write_customers`, `read_customers`, `read_orders`
+
+### shopify-dev (Development Docs)
+Package: `@shopify/dev-mcp` — Official Shopify development assistant. Searches docs, explores API schemas, helps build Functions. No authentication needed.
+
+### What MCP Cannot Do
+These require manual setup in Shopify Admin UI (or Sidekick AI):
+- Email templates (no API — use Shopify Email UI)
+- Shopify Flow workflows (no creation API — use Flow editor or Sidekick AI)
+- Marketing campaign creation (tracking only via API)
+- Advanced discount logic beyond basic codes (requires Discount Functions app extension)
+
+### Sales Event Pattern: "First N Get X% Off"
+1. **Via MCP:** Create a discount code with `max_uses` limit (e.g., EARLYBIRD30, 30% off, 15 uses)
+2. **Via Shopify Flow (manual):** Trigger on "Order created" → check if discount used → tag customer
+3. **Via Shopify Email (manual):** Conditional emails based on customer tag
