@@ -69,3 +69,17 @@
 .newsletter-form__button .icon {
   width: 1.5rem;
 }
+
+.newsletter-form__field-wrapper .field::after {
+  box-shadow: 0 0 0 0.1rem rgba(var(--color-foreground), 0.4);
+  border-radius: var(--inputs-radius);
+}
+
+.newsletter-form__field-wrapper .field:hover::after {
+  box-shadow: 0 0 0 0.1rem rgba(var(--color-foreground), 0.6);
+}
+
+.newsletter-form__field-wrapper .field__input:focus ~ .field__button + .field__label::after,
+.newsletter-form__field-wrapper .field__input:focus-visible ~ .field__button + .field__label::after {
+  box-shadow: 0 0 0 0.2rem rgba(var(--color-foreground), 0.6);
+}

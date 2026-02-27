@@ -18,8 +18,8 @@
   }
 
   .discount-gate__placeholder {
-    background: rgba(var(--color-foreground), 0.04);
-    border: 2px dashed rgba(var(--color-foreground), 0.15);
+    background: rgba(212, 165, 116, 0.12);
+    border: 2px dashed rgba(212, 165, 116, 0.6);
     border-radius: 12px;
     padding: 2rem;
     text-align: center;
@@ -29,7 +29,15 @@
   .discount-gate__placeholder p {
     margin: 0;
     font-size: 1.1rem;
-    opacity: 0.8;
+    color: rgba(var(--color-foreground), 1);
+  }
+
+  .main-page-title {
+    text-align: center;
+  }
+
+  #gated-page-content .rte p {
+    color: rgba(var(--color-foreground), 1);
   }
 
   .discount-gate__revealed {
@@ -104,11 +112,49 @@
     placeholder.innerHTML = '<p><strong>Subscribe below to reveal your exclusive discount code!</strong></p>';
     firstHidden.parentNode.insertBefore(placeholder, firstHidden);
 
+    // Create an anchor to relocate the forms section inline, right after the placeholder
+    var formAnchor = document.createElement('div');
+    formAnchor.id = 'discount-gate-form-anchor';
+    placeholder.parentNode.insertBefore(formAnchor, placeholder.nextSibling);
+
+    // Move the Shopify Forms app section into the anchor
+    var formsSection = document.querySelector('[id*="shopify-section"][id*="forms"]') ||
+                       document.querySelector('.shopify-section [data-forms-id]');
+    if (formsSection) {
+      // Get the full section wrapper
+      var sectionWrapper = formsSection.closest('.shopify-section') || formsSection;
+      formAnchor.appendChild(sectionWrapper);
+    } else {
+      // Forms section may not have loaded yet; watch for it
+      var formRelocObserver = new MutationObserver(function(mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          for (var j = 0; j < mutations[i].addedNodes.length; j++) {
+            var node = mutations[i].addedNodes[j];
+            if (node.nodeType !== 1) continue;
+            var isFormsSection = (node.id && node.id.indexOf('forms') !== -1 && node.classList && node.classList.contains('shopify-section')) ||
+                                 (node.querySelector && node.querySelector('[data-forms-id]'));
+            if (isFormsSection) {
+              var wrapper = node.closest('.shopify-section') || node;
+              formAnchor.appendChild(wrapper);
+              formRelocObserver.disconnect();
+              return;
+            }
+          }
+        }
+      });
+      formRelocObserver.observe(document.body, { childList: true, subtree: true });
+      setTimeout(function() { formRelocObserver.disconnect(); }, 30000);
+    }
+
     function revealDiscount() {
       try { localStorage.setItem(STORAGE_KEY, 'true'); } catch(e) {}
 
       var ph = document.getElementById('discount-gate-placeholder');
       if (ph) ph.remove();
+
+      // Hide the form anchor (form no longer needed once code is revealed)
+      var anchor = document.getElementById('discount-gate-form-anchor');
+      if (anchor) anchor.style.display = 'none';
 
       content.querySelectorAll('.discount-gate__hidden').forEach(function(el) {
         el.classList.remove('discount-gate__hidden');
@@ -116,46 +162,65 @@
       });
     }
 
-    // Strategy 1: MutationObserver watching for Shopify Forms success state
     var revealed = false;
-    var observer = new MutationObserver(function(mutations) {
-      if (revealed) return;
-      for (var i = 0; i < mutations.length; i++) {
-        var mutation = mutations[i];
-        // Check added nodes for success/thank you messages from the forms app
-        for (var j = 0; j < mutation.addedNodes.length; j++) {
-          var node = mutation.addedNodes[j];
-          if (node.nodeType === 1 && node.textContent && node.textContent.match(/thank\s*you|success|submitted|confirmed/i)) {
-            revealed = true;
-            revealDiscount();
-            observer.disconnect();
-            return;
-          }
+
+    function attachFormListener(formEmbed) {
+      if (!formEmbed || !formEmbed.shadowRoot) return false;
+      var shadow = formEmbed.shadowRoot;
+      var form = shadow.querySelector('form');
+      if (!form) return false;
+
+      // Primary: watch for the <form> element to be removed from shadow DOM
+      // (Shopify Forms replaces it with a success/thank-you message on success)
+      var shadowObserver = new MutationObserver(function() {
+        if (revealed) return;
+        var formStillExists = shadow.querySelector('form');
+        if (!formStillExists) {
+          revealed = true;
+          revealDiscount();
+          shadowObserver.disconnect();
         }
-        // Check attribute changes (Shopify Forms may toggle visibility classes)
-        if (mutation.type === 'attributes' && mutation.target.nodeType === 1) {
-          var el = mutation.target;
-          if (el.textContent && el.textContent.match(/thank\s*you|success|submitted|confirmed/i)) {
-            var style = window.getComputedStyle(el);
-            if (style.display !== 'none' && style.visibility !== 'hidden') {
-              revealed = true;
-              revealDiscount();
-              observer.disconnect();
+      });
+      shadowObserver.observe(shadow, { childList: true, subtree: true });
+
+      return true;
+    }
+
+    // Strategy 1: Attach submit listener to Shopify Forms <form-embed> shadow DOM
+    var formEmbed = document.querySelector('form-embed');
+    if (formEmbed) {
+      if (!attachFormListener(formEmbed)) {
+        // shadowRoot not ready yet, watch for it
+        var embedObserver = new MutationObserver(function() {
+          if (formEmbed.shadowRoot && attachFormListener(formEmbed)) {
+            embedObserver.disconnect();
+          }
+        });
+        embedObserver.observe(formEmbed, { childList: true, subtree: true });
+      }
+    }
+
+    // Strategy 2: Wait for <form-embed> to appear if not yet in DOM
+    if (!formEmbed) {
+      var bodyObserver = new MutationObserver(function(mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          for (var j = 0; j < mutations[i].addedNodes.length; j++) {
+            var node = mutations[i].addedNodes[j];
+            if (node.nodeType !== 1) continue;
+            var embed = node.tagName === 'FORM-EMBED' ? node : node.querySelector && node.querySelector('form-embed');
+            if (embed && attachFormListener(embed)) {
+              bodyObserver.disconnect();
               return;
             }
           }
         }
-      }
-    });
+      });
+      bodyObserver.observe(document.body, { childList: true, subtree: true });
+      // Stop waiting after 30 seconds
+      setTimeout(function() { bodyObserver.disconnect(); }, 30000);
+    }
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'style', 'hidden']
-    });
-
-    // Strategy 2: Listen for postMessage from Shopify Forms iframe
+    // Strategy 3: Listen for postMessage as fallback (some form integrations use this)
     window.addEventListener('message', function(event) {
       if (revealed) return;
       try {
@@ -167,21 +232,6 @@
         }
       } catch(e) {}
     });
-
-    // Strategy 3: Poll for form completion (fallback for cross-origin iframes)
-    var pollCount = 0;
-    var pollInterval = setInterval(function() {
-      if (revealed || ++pollCount > 300) { clearInterval(pollInterval); return; }
-      // Check if any visible element on the page now says "thank you" or similar
-      var appBlocks = document.querySelectorAll('.shopify-app-block, [id*="forms"]');
-      appBlocks.forEach(function(block) {
-        if (block.textContent.match(/thank\s*you|success|submitted/i)) {
-          revealed = true;
-          revealDiscount();
-          clearInterval(pollInterval);
-        }
-      });
-    }, 2000);
   })();
 </script>
 
