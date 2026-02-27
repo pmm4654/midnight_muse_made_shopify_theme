@@ -19,7 +19,11 @@
         "3343144d-c957-46f8-8d91-7c82d1ecd5b9": {
           "type": "shopify://apps/forms/blocks/inline/8744a304-fcb1-4347-b211-bb6b4759a76a",
           "settings": {
-            "form_id": "888387"
+            "form_id": "888387",
+            "text_color": "#faf3e0",
+            "button_background_color": "#d4a574",
+            "button_label_color": "#0d0d0d",
+            "links_color": "#d4a574"
           }
         }
       },

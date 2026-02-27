@@ -70,6 +70,15 @@
   width: 1.5rem;
 }
 
+.newsletter-form__button {
+  color: currentColor;
+  opacity: 1;
+}
+
+.newsletter-form .field__label {
+  opacity: 1;
+}
+
 .newsletter-form__field-wrapper .field::after {
   box-shadow: 0 0 0 0.1rem rgba(var(--color-foreground), 0.4);
   border-radius: var(--inputs-radius);
