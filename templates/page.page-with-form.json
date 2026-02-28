@@ -43,10 +43,46 @@
       "settings": {
         "include_margins": true
       }
+    },
+    "rich_text_AeU7aw": {
+      "type": "rich-text",
+      "blocks": {
+        "text_JjDN4E": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>How It Works</h3><ol><li>Fill out the form above to subscribe to our mailing list</li><li>You'll receive an exclusive discount for 50% off to your email</li><li>Shop our collection and add the discount at checkout</li><li>Enjoy 50% off your order!</li></ol>"
+          }
+        },
+        "button_9Akb6z": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_style_secondary": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "text_JjDN4E",
+        "button_9Akb6z"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
     }
   },
   "order": [
     "main",
-    "apps_ttQCJy"
+    "apps_ttQCJy",
+    "rich_text_AeU7aw"
   ]
 }
