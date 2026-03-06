@@ -16,6 +16,8 @@
   {{ 'component-rating.css' | asset_url | stylesheet_tag }}
   {{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
   {{ 'component-uploadery-custom.css' | asset_url | stylesheet_tag }}
+  {{ 'component-sticky-atc.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'sticky-atc.js' | asset_url }}" defer="defer"></script>
 
   {% unless product.has_only_default_variant %}
     {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
@@ -738,6 +740,38 @@
       {{ product | structured_data }}
     </script>
   </div>
+  {%- comment -%} Mobile sticky Add to Cart bar {%- endcomment -%}
+  {%- assign current_variant = product.selected_or_first_available_variant -%}
+  <sticky-add-to-cart
+    class="sticky-atc-bar color-{{ section.settings.color_scheme }}"
+    data-section-id="{{ section.id }}"
+  >
+    <div class="sticky-atc-bar__inner">
+      <div class="sticky-atc-bar__info">
+        <p class="sticky-atc-bar__title">{{ product.title | truncate: 30 }}</p>
+        <p class="sticky-atc-bar__price">{{ current_variant.price | money }}</p>
+      </div>
+      <div class="sticky-atc-bar__button">
+        <button
+          type="button"
+          class="sticky-atc__submit button button--primary button--full-width"
+          {% if current_variant.available == false or current_variant == null %}
+            disabled
+          {% endif %}
+        >
+          <span>
+            {%- if current_variant == null -%}
+              {{ 'products.product.unavailable' | t }}
+            {%- elsif current_variant.available == false -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- else -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- endif -%}
+          </span>
+        </button>
+      </div>
+    </div>
+  </sticky-add-to-cart>
 </product-info>
 
 {% schema %}

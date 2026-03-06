@@ -1,0 +1,117 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "vendor": {
+          "type": "text",
+          "settings": {
+            "text": "{{ product.vendor }}",
+            "text_style": "uppercase"
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button",
+            "swatch_shape": "circle"
+          }
+        },
+        "quantity_selector": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "faq": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Frequently Asked Questions",
+            "icon": "question_mark",
+            "content": "<p><strong>How long does shipping take?</strong><br>Most orders ship within 5–7 business days. Each piece is conjured to order, so please allow a little extra time during busy spells.</p><p><strong>What if I don't like it?</strong><br>We want you to love your piece! If something isn't right, reach out and we'll make it right — remake or refund, no hexes involved.</p><p><strong>Is this item handmade?</strong><br>Every piece is crafted with care by our small coven. No mass production, no shortcuts — just quality work made with love and a little bit of magic.</p><p><strong>Can I order this as a gift?</strong><br>Absolutely! We can ship directly to your recipient. Add a gift message at checkout and we'll include it with the order.</p>"
+          }
+        },
+        "from_the_maker": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "A Note from the Maker",
+            "icon": "heart",
+            "content": "<p>Hi there, fellow creature of the night! I'm the human behind Midnight Muse Made, and every single piece you see here is crafted with love, a little bit of magic, and way too much coffee.</p><p>When you order from here, you're not just buying a product. You're supporting a small, independent maker who genuinely cares about quality and getting every detail just right.</p><p>Thank you for being part of this little coven. Stay strange. Stay spooky.</p>"
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {
+            "share_label": "Share"
+          }
+        }
+      },
+      "block_order": [
+        "vendor",
+        "title",
+        "price",
+        "variant_picker",
+        "quantity_selector",
+        "buy_buttons",
+        "description",
+        "faq",
+        "from_the_maker",
+        "share"
+      ],
+      "settings": {
+        "enable_sticky_info": true,
+        "color_scheme": "scheme-dark-main",
+        "media_size": "large",
+        "constrain_to_viewport": true,
+        "media_fit": "contain",
+        "gallery_layout": "stacked",
+        "mobile_thumbnails": "show",
+        "media_position": "left",
+        "image_zoom": "lightbox",
+        "hide_variants": true,
+        "enable_video_looping": false,
+        "padding_top": 60,
+        "padding_bottom": 24
+      }
+    },
+    "related-products": {
+      "type": "related-products",
+      "settings": {
+        "heading": "More Creepy Curiosities",
+        "heading_size": "h2",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "color_scheme": "scheme-dark-card",
+        "image_ratio": "portrait",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    }
+  },
+  "order": [
+    "main",
+    "related-products"
+  ]
+}

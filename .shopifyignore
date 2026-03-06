@@ -1,2 +1,6 @@
 meta-ads-manager/
 shopify-meta-ads.zip
+*.tmp.*
+combined-reports/
+marketing-research/
+audit-screenshots/
