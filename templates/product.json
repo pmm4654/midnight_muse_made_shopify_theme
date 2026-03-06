@@ -64,11 +64,11 @@
         "vendor",
         "title",
         "price",
+        "description",
         "variant_picker",
         "uploadery_app_block_GFhTGm",
         "quantity_selector",
         "buy_buttons",
-        "description",
         "share"
       ],
       "settings": {
@@ -78,7 +78,7 @@
         "constrain_to_viewport": true,
         "media_fit": "contain",
         "gallery_layout": "stacked",
-        "mobile_thumbnails": "hide",
+        "mobile_thumbnails": "show",
         "media_position": "left",
         "image_zoom": "lightbox",
         "hide_variants": true,

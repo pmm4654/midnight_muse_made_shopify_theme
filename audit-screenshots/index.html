@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Midnight Muse Made - Site Audit Screenshots</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 2rem; }
+  h1 { text-align: center; margin-bottom: 0.5rem; font-size: 1.8rem; color: #fff; }
+  .subtitle { text-align: center; color: #999; margin-bottom: 2rem; font-size: 0.95rem; }
+  .correction { background: #2a1a1a; border: 1px solid #5c3a1a; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
+  .correction h3 { color: #ffa94d; margin-bottom: 0.5rem; }
+  .correction p { color: #ccc; font-size: 0.9rem; line-height: 1.5; }
+  .section-title { color: #d4a574; font-size: 1.4rem; margin: 3rem 0 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #333; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+  .card { background: #1a1a1a; border-radius: 12px; overflow: hidden; border: 1px solid #2a2a2a; }
+  .card img { width: 100%; height: auto; display: block; cursor: pointer; transition: opacity 0.2s; }
+  .card img:hover { opacity: 0.9; }
+  .card .caption { padding: 1rem 1.2rem; }
+  .card .caption h3 { font-size: 1rem; color: #fff; margin-bottom: 0.4rem; }
+  .card .caption p { font-size: 0.85rem; color: #aaa; line-height: 1.5; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 6px; }
+  .badge-critical { background: #5c1a1a; color: #ff6b6b; }
+  .badge-high { background: #5c3a1a; color: #ffa94d; }
+  .badge-info { background: #1a3a5c; color: #74b9ff; }
+  .badge-good { background: #1a4a2a; color: #69db7c; }
+  .badge-retracted { background: #3a3a3a; color: #999; }
+  .badge-fixed { background: #1a4a2a; color: #69db7c; }
+  .badge-validated { background: #0d3320; color: #51cf66; border: 1px solid #2b8a3e; }
+  .validated-banner { background: linear-gradient(135deg, #0d3320, #1a4a2a); border: 2px solid #2b8a3e; border-radius: 10px; padding: 1.2rem 1.5rem; margin-bottom: 2rem; }
+  .validated-banner h3 { color: #69db7c; margin-bottom: 0.4rem; font-size: 1.1rem; }
+  .validated-banner p { color: #b2dfb5; font-size: 0.9rem; line-height: 1.5; }
+  /* Lightbox */
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center; cursor: zoom-out; }
+  .lightbox.active { display: flex; }
+  .lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; }
+  @media (max-width: 500px) { .grid { grid-template-columns: 1fr; } body { padding: 1rem; } }
+</style>
+</head>
+<body>
+
+<h1>Midnight Muse Made - Visual Audit &amp; Fixes</h1>
+<p class="subtitle">Screenshots captured March 5-6, 2026 via Playwright browser automation</p>
+
+<div class="correction">
+  <h3>Correction: "Invisible Sections" was a screenshot artifact</h3>
+  <p>The original full-page screenshots showed the bottom half of pages as blank. This is a <strong>Playwright fullPage screenshot rendering bug</strong> on dark themes. The live site renders correctly. That finding has been retracted.</p>
+</div>
+
+<!-- ============ VALIDATED FIXES ============ -->
+
+<h2 class="section-title" style="color: #69db7c;">Fixes Implemented - Before &amp; After</h2>
+
+<div class="validated-banner">
+  <h3>All 5 fixes validated on dev server (March 6, 2026)</h3>
+  <p>Screenshots below were taken from the live dev server at localhost:9292 after all code changes were deployed. Each fix is shown with its before state and the validated after state.</p>
+</div>
+
+<h3 style="color: #69db7c; margin: 2rem 0 1rem;">1. Hero Overlay: 70% &rarr; 30%</h3>
+<div class="grid">
+  <div class="card">
+    <img src="fix-hero-before.png" onclick="openLightbox(this)" alt="Hero before - 70% overlay">
+    <div class="caption">
+      <h3>BEFORE: 70% dark overlay</h3>
+      <p>Product flat-lay almost invisible. Visitors could not see what the store sells.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-hero.png" onclick="openLightbox(this)" alt="Hero after - 30% overlay, validated">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> 30% overlay</h3>
+      <p>Products clearly visible -- tumblers, air fresheners, earrings, stickers all pop through the lighter overlay. Text remains legible against the background.</p>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: #69db7c; margin: 2rem 0 1rem;">2. Description Moved Above Buy Buttons</h3>
+<div class="grid">
+  <div class="card">
+    <img src="04-desktop-product-above-fold.png" onclick="openLightbox(this)" alt="Product before - description below buy area">
+    <div class="caption">
+      <h3>BEFORE: Description buried below buy area</h3>
+      <p>Customers had to scroll past Add to Cart to learn what they were buying.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-pdp-1.png" onclick="openLightbox(this)" alt="Product after - description above buy buttons, validated">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> Description above buy area</h3>
+      <p>Product details ("Take your furry best friend on every ride", What You'll Get, etc.) now appear right after the price, before variant pickers and buy buttons.</p>
+    </div>
+  </div>
+</div>
+<div class="grid">
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-pdp-2.png" onclick="openLightbox(this)" alt="Description detail - What You'll Get section">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> Description detail view</h3>
+      <p>"What You'll Get" and "Perfect For" sections visible as customer scrolls, all appearing before the buy area.</p>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: #69db7c; margin: 2rem 0 1rem;">3. Upload Widget Styled</h3>
+<div class="grid">
+  <div class="card">
+    <img src="16-mobile-file-upload.png" onclick="openLightbox(this)" alt="Upload before - raw file input">
+    <div class="caption">
+      <h3>BEFORE: Raw browser file input</h3>
+      <p><span class="badge badge-critical">WAS CRITICAL</span> Plain "Choose File | No file chosen" with no guidance, no styling. Looked broken.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-pdp-3.png" onclick="openLightbox(this)" alt="Upload after - styled drop zone with camera icon, validated">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> Styled upload drop zone (desktop)</h3>
+      <p>Dashed gold border, camera icon, "UPLOAD A CLEAR, WELL-LIT PHOTO OF YOUR PET" instructional text. Matches the dark theme perfectly.</p>
+    </div>
+  </div>
+</div>
+<div class="grid">
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-mobile-3.png" onclick="openLightbox(this)" alt="Upload widget on mobile, validated">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> Upload widget on mobile (375px)</h3>
+      <p>Same styled drop zone renders cleanly on mobile -- dashed border, camera icon, and instructional text all fit within the narrow viewport.</p>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: #69db7c; margin: 2rem 0 1rem;">4. Trust Badges Added Below Buy Buttons</h3>
+<div class="grid">
+  <div class="card">
+    <img src="11-mobile-product-buy-area.png" onclick="openLightbox(this)" alt="Buy area before - no trust signals">
+    <div class="caption">
+      <h3>BEFORE: No trust signals near buy button</h3>
+      <p><span class="badge badge-high">WAS HIGH</span> Nothing below the buy buttons to reassure visitors about security or shipping.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-pdp-4.png" onclick="openLightbox(this)" alt="Trust badges below buy buttons on desktop, validated">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> Trust badges (desktop)</h3>
+      <p>Lock "Secure Checkout", truck "Free Shipping $50+", heart "Handmade to Order" -- all in gold, right below the purchase buttons.</p>
+    </div>
+  </div>
+</div>
+<div class="grid">
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-mobile-4.png" onclick="openLightbox(this)" alt="Trust badges on mobile, validated">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> Trust badges on mobile (375px)</h3>
+      <p>All three trust badges visible on mobile immediately below the buy area. Upload widget, name field, Add to Cart, Buy with Shop Pay, and trust signals all in clear flow.</p>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: #69db7c; margin: 2rem 0 1rem;">5. Mobile Thumbnails Enabled</h3>
+<div class="grid">
+  <div class="card">
+    <img src="10-mobile-product-above-fold.png" onclick="openLightbox(this)" alt="Mobile before - no thumbnails">
+    <div class="caption">
+      <h3>BEFORE: No thumbnail strip on mobile</h3>
+      <p><span class="badge badge-high">WAS HIGH</span> Users had to swipe blind through images with no preview of what's available.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-mobile-1.png" onclick="openLightbox(this)" alt="Mobile after - thumbnails visible, validated">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> Thumbnail strip on mobile</h3>
+      <p>Two thumbnail previews now visible below the main product image at 375px width. Users can tap to jump between images.</p>
+    </div>
+  </div>
+</div>
+<div class="grid">
+  <div class="card" style="border-color: #2b8a3e;">
+    <img src="validated-mobile-2.png" onclick="openLightbox(this)" alt="Mobile thumbnails and description, validated">
+    <div class="caption">
+      <h3><span class="badge badge-validated">VALIDATED</span> Thumbnails + description flow</h3>
+      <p>Scrolling past the thumbnails, the product title, price, and description are immediately visible -- the full improved mobile flow.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FIXES APPLIED (previous reference) ============ -->
+
+<h2 class="section-title">Fix 1: Hero Overlay Reduced (70% to 30%)</h2>
+<div class="grid">
+  <div class="card">
+    <img src="02-desktop-homepage-viewport.png" onclick="openLightbox(this)" alt="Hero before">
+    <div class="caption">
+      <h3>BEFORE: Hero at 70% overlay</h3>
+      <p>Product flat-lay barely visible behind heavy dark overlay. Visitors can't see what the store sells.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #1a4a2a;">
+    <img src="fix-hero-after-verified.png" onclick="openLightbox(this)" alt="Hero after fix">
+    <div class="caption">
+      <h3><span class="badge badge-fixed">FIXED</span> Hero at 30% overlay</h3>
+      <p>Products now clearly visible -- tumblers, air fresheners, earrings, skull items. Visitors immediately see what the store offers.</p>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">Fix 2: Description Moved Above Buy Buttons</h2>
+<div class="grid">
+  <div class="card">
+    <img src="04-desktop-product-above-fold.png" onclick="openLightbox(this)" alt="Product before - description below">
+    <div class="caption">
+      <h3>BEFORE: Description buried below buy area</h3>
+      <p>Customers had to scroll past Add to Cart to learn what they were buying. Key details like materials, what's included, and shipping were hidden.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #1a4a2a;">
+    <img src="fix-product-viewport-2.png" onclick="openLightbox(this)" alt="Product after - description above">
+    <div class="caption">
+      <h3><span class="badge badge-fixed">FIXED</span> Description now above variants</h3>
+      <p>Product details ("Take your furry best friend on every ride", What You'll Get, etc.) are now visible right after the price, before the variant picker and buy buttons.</p>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">Fix 3: Uploadery Widget Styled</h2>
+<div class="grid">
+  <div class="card">
+    <img src="16-mobile-file-upload.png" onclick="openLightbox(this)" alt="Upload before - raw input">
+    <div class="caption">
+      <h3>BEFORE: Raw browser file input</h3>
+      <p><span class="badge badge-critical">WAS CRITICAL</span> Plain "Choose File | No file chosen" -- no guidance, no styling, no preview. Looked broken/amateur.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #1a4a2a;">
+    <img src="fix-product-viewport-6.png" onclick="openLightbox(this)" alt="Upload after - styled drop zone">
+    <div class="caption">
+      <h3><span class="badge badge-fixed">FIXED</span> Styled upload drop zone</h3>
+      <p>Dashed border drop zone with camera icon, styled "Choose File" button in gold, and instructional text "UPLOAD A CLEAR, WELL-LIT PHOTO OF YOUR PET". Matches the dark theme.</p>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">Fix 4: Trust Badges Added</h2>
+<div class="grid">
+  <div class="card">
+    <img src="11-mobile-product-buy-area.png" onclick="openLightbox(this)" alt="Buy area before - no trust signals">
+    <div class="caption">
+      <h3>BEFORE: No trust signals near buy button</h3>
+      <p><span class="badge badge-high">WAS HIGH</span> Nothing below the buy buttons to reassure visitors about security, shipping, or quality.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #1a4a2a;">
+    <img src="fix-product-viewport-7.png" onclick="openLightbox(this)" alt="Buy area after - trust badges">
+    <div class="caption">
+      <h3><span class="badge badge-fixed">FIXED</span> Trust badges below buy buttons</h3>
+      <p>Lock icon "Secure Checkout", truck icon "Free Shipping $50+", heart icon "Handmade to Order" -- all in gold, matching the theme. Visible right after the purchase area.</p>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">Fix 5: Mobile Thumbnails Enabled</h2>
+<div class="grid">
+  <div class="card">
+    <img src="10-mobile-product-above-fold.png" onclick="openLightbox(this)" alt="Mobile before - no thumbnails">
+    <div class="caption">
+      <h3>BEFORE: No thumbnail strip on mobile</h3>
+      <p><span class="badge badge-high">WAS HIGH</span> Users had to swipe blind through 8+ images with no preview of what's available.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #1a4a2a;">
+    <img src="fix-product-viewport-7.png" onclick="openLightbox(this)" alt="Mobile after - thumbnails visible">
+    <div class="caption">
+      <h3><span class="badge badge-fixed">FIXED</span> Thumbnail strip now visible</h3>
+      <p>Mobile users can now see thumbnail previews of all product images, making it easy to browse the gallery without sequential swiping.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FULL PRODUCT PAGE FLOW ============ -->
+
+<h2 class="section-title">Fixed Product Page Flow (Top to Bottom)</h2>
+<div class="grid">
+  <div class="card">
+    <img src="fix-product-viewport-1.png" onclick="openLightbox(this)" alt="Fixed PDP - above fold">
+    <div class="caption">
+      <h3>1. Above the Fold</h3>
+      <p>Product image, title, price visible immediately.</p>
+    </div>
+  </div>
+  <div class="card">
+    <img src="fix-product-viewport-2.png" onclick="openLightbox(this)" alt="Fixed PDP - description">
+    <div class="caption">
+      <h3>2. Description (now above buy area)</h3>
+      <p>Full product details, "What You'll Get" section visible before purchase decision.</p>
+    </div>
+  </div>
+  <div class="card">
+    <img src="fix-product-viewport-5.png" onclick="openLightbox(this)" alt="Fixed PDP - variants">
+    <div class="caption">
+      <h3>3. Variant Picker</h3>
+      <p>Design and Scent options after the customer understands the product.</p>
+    </div>
+  </div>
+  <div class="card">
+    <img src="fix-product-viewport-6.png" onclick="openLightbox(this)" alt="Fixed PDP - upload and buy">
+    <div class="caption">
+      <h3>4. Upload + Buy Area</h3>
+      <p>Styled upload drop zone, quantity, dog's name field, and Add to Cart button.</p>
+    </div>
+  </div>
+  <div class="card">
+    <img src="fix-product-viewport-7.png" onclick="openLightbox(this)" alt="Fixed PDP - trust badges">
+    <div class="caption">
+      <h3>5. Trust Badges + Related Products</h3>
+      <p>Secure Checkout, Free Shipping, Handmade to Order badges. "More Creepy Curiosities" below.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REMAINING ISSUES ============ -->
+
+<h2 class="section-title">Remaining Issues (Require Shopify Admin)</h2>
+<div class="grid">
+  <div class="card" style="border-color: #5c3a1a;">
+    <div class="caption">
+      <h3><span class="badge badge-high">HIGH</span> Zero Reviews / Social Proof</h3>
+      <p>No star ratings or customer photos on product pages. Install Judge.me (free) and collect reviews from past customers.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #5c3a1a;">
+    <div class="caption">
+      <h3><span class="badge badge-high">HIGH</span> Chat Widget False Notification</h3>
+      <p>Shopify Inbox shows red "1" badge on every page. Fix in Shopify Admin > Settings > Inbox.</p>
+    </div>
+  </div>
+  <div class="card" style="border-color: #1a3a5c;">
+    <div class="caption">
+      <h3><span class="badge badge-info">INFO</span> Hero Copy Could Be More Specific</h3>
+      <p>"Magic, mischief & handmade things" is atmospheric but doesn't tell visitors what's sold. Consider: "Personalized Gothic Gifts & Keepsakes".</p>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="Zoomed screenshot">
+</div>
+
+<script>
+function openLightbox(img) {
+  document.getElementById('lightbox-img').src = img.src;
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+
+</body>
+</html>
