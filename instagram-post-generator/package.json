@@ -1,0 +1,17 @@
+{
+  "name": "instagram-post-generator",
+  "version": "1.0.0",
+  "description": "AI-powered Instagram post generator for Midnight Muse Made — picks products, writes captions, and suggests visuals",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "generate": "node scripts/generate-post.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "dotenv": "^16.4.0",
+    "node-fetch": "^2.7.0",
+    "@anthropic-ai/sdk": "^0.39.0"
+  }
+}
