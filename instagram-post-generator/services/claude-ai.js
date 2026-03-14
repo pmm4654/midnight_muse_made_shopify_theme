@@ -179,7 +179,7 @@ Please provide your response in this exact JSON format:
     }
   ],
   "postingTips": "Brief tips on when/how to post this",
-  ${includeImagePrompt ? '"imageGenerationPrompt": "A detailed prompt for generating a styled promotional image featuring these products. Describe the scene, lighting, colors, composition, and mood. This should be suitable for an AI image generator like DALL-E or Midjourney.",' : ''}
+  ${includeImagePrompt ? `"imageGenerationPrompt": "A detailed prompt for generating a styled product photo. Structure it with ALL 5 of these elements in order: (1) image style (e.g. 'studio product photo', 'creative product photograph'), (2) product description, (3) placement (e.g. 'on a dark marble surface'), (4) surroundings (e.g. 'surrounded by dried lavender and crystals'), (5) background (e.g. 'deep plum velvet with warm candlelight'). Include 2-3 quality modifiers like 'professional product photography, in focus, soft directional lighting'. Use the brand aesthetic: dark/gothic/cozy with deep purples, warm golds, near-black tones, candlelight, vintage textures. IMPORTANT: Do NOT describe humans, hands, animals, weapons, or sexual content. Do NOT be vague — be specific and atmospheric like a photographer's creative brief.",` : ''}
   "altText": "Accessible alt text describing the post image"
 }`;
 

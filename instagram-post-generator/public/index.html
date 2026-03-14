@@ -107,8 +107,61 @@
       max-height: 250px;
       overflow-y: auto;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0 0 6px 6px;
+      border-top: none;
+    }
+
+    .product-search-wrap {
       margin-top: 0.3rem;
+    }
+
+    .product-search-wrap input {
+      border-radius: 6px 6px 0 0;
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .selected-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+    }
+
+    .selected-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--accent-soft);
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      cursor: default;
+    }
+
+    .selected-chip .remove-chip {
+      cursor: pointer;
+      opacity: 0.7;
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    .selected-chip .remove-chip:hover { opacity: 1; }
+
+    .product-count-badge {
+      font-size: 0.75rem;
+      background: var(--accent);
+      color: white;
+      padding: 0.1rem 0.5rem;
+      border-radius: 10px;
+      margin-left: 0.3rem;
+    }
+
+    .no-results {
+      padding: 1rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
     }
 
     .product-item {
@@ -322,8 +375,12 @@
       </select>
 
       <div id="productPickerWrap" style="display:none">
-        <label>Select Products (click to toggle)</label>
-        <div class="product-picker" id="productPicker"></div>
+        <label>Select Products <span id="selectedBadge" class="product-count-badge" style="display:none">0 selected</span></label>
+        <div id="selectedChips" class="selected-chips"></div>
+        <div class="product-search-wrap">
+          <input type="text" id="productSearch" placeholder="Search products by name..." oninput="filterProducts()">
+          <div class="product-picker" id="productPicker"></div>
+        </div>
       </div>
 
       <label>Number of products (for auto-pick)</label>
@@ -436,6 +493,8 @@
         if (!res.ok) throw new Error(data.error);
         allProducts = data.products || [];
         selectedHandles.clear();
+        const searchInput = document.getElementById('productSearch');
+        if (searchInput) searchInput.value = '';
         renderProductPicker();
 
         const statusEl = document.getElementById('statusText');
@@ -450,25 +509,66 @@
 
     function renderProductPicker() {
       const picker = document.getElementById('productPicker');
-      picker.innerHTML = allProducts.map(p => `
-        <div class="product-item ${selectedHandles.has(p.handle) ? 'selected' : ''}"
-             onclick="toggleProduct('${p.handle}', this)">
-          ${p.thumbnail ? `<img src="${p.thumbnail}" alt="">` : '<div style="width:40px;height:40px;background:var(--bg);border-radius:4px"></div>'}
-          <div class="info">
-            <div class="title">${escapeHtml(p.title)}</div>
-            <div class="price">$${p.price} · ${p.imageCount} images</div>
+      const query = (document.getElementById('productSearch')?.value || '').toLowerCase().trim();
+      const filtered = query
+        ? allProducts.filter(p => p.title.toLowerCase().includes(query) || (p.tags || []).join(' ').toLowerCase().includes(query))
+        : allProducts;
+
+      if (filtered.length === 0 && query) {
+        picker.innerHTML = `<div class="no-results">No products matching "${escapeHtml(query)}"</div>`;
+      } else {
+        picker.innerHTML = filtered.map(p => `
+          <div class="product-item ${selectedHandles.has(p.handle) ? 'selected' : ''}"
+               onclick="toggleProduct('${p.handle}')">
+            ${p.thumbnail ? `<img src="${p.thumbnail}" alt="">` : '<div style="width:40px;height:40px;background:var(--bg);border-radius:4px"></div>'}
+            <div class="info">
+              <div class="title">${escapeHtml(p.title)}</div>
+              <div class="price">$${p.price} · ${p.imageCount} images</div>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
+
+      updateSelectedUI();
     }
 
-    function toggleProduct(handle, el) {
+    function filterProducts() {
+      renderProductPicker();
+    }
+
+    function toggleProduct(handle) {
       if (selectedHandles.has(handle)) {
         selectedHandles.delete(handle);
-        el.classList.remove('selected');
       } else {
         selectedHandles.add(handle);
-        el.classList.add('selected');
+      }
+      renderProductPicker();
+    }
+
+    function removeProduct(handle) {
+      selectedHandles.delete(handle);
+      renderProductPicker();
+    }
+
+    function updateSelectedUI() {
+      const badge = document.getElementById('selectedBadge');
+      const chipsEl = document.getElementById('selectedChips');
+      const count = selectedHandles.size;
+
+      if (count > 0) {
+        badge.textContent = `${count} selected`;
+        badge.style.display = '';
+        chipsEl.innerHTML = Array.from(selectedHandles).map(handle => {
+          const product = allProducts.find(p => p.handle === handle);
+          const title = product ? product.title : handle;
+          return `<span class="selected-chip">
+            ${escapeHtml(title)}
+            <span class="remove-chip" onclick="removeProduct('${handle}')">&times;</span>
+          </span>`;
+        }).join('');
+      } else {
+        badge.style.display = 'none';
+        chipsEl.innerHTML = '';
       }
     }
 
