@@ -24,33 +24,17 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`\n  Instagram Post Generator running at http://localhost:${PORT}\n`);
 
-  const missing = [];
-  if (!process.env.ANTHROPIC_API_KEY) {
-    if (process.env.ANTHROPIC_BASE_URL) {
-      console.log('  ANTHROPIC_API_KEY not set — using local Anthropic proxy.');
-    } else {
-      try {
-        const fs = require('fs');
-        const os = require('os');
-        const credPath = path.join(os.homedir(), '.claude', '.credentials.json');
-        const creds = JSON.parse(fs.readFileSync(credPath, 'utf-8'));
-        if (creds.claudeAiOauth?.accessToken) {
-          console.log('  ANTHROPIC_API_KEY not set — will use Claude Code CLI auth.');
-        } else {
-          missing.push('ANTHROPIC_API_KEY');
-        }
-      } catch {
-        missing.push('ANTHROPIC_API_KEY');
-      }
-    }
-  }
-
-  if (missing.length) {
-    console.log('  Missing env vars:');
-    missing.forEach((v) => console.log(`    - ${v}`));
-    console.log('');
+  if (process.env.ANTHROPIC_API_KEY) {
+    console.log('  AI auth: ANTHROPIC_API_KEY set.\n');
+  } else if (process.env.ANTHROPIC_BASE_URL) {
+    console.log('  AI auth: using local proxy at', process.env.ANTHROPIC_BASE_URL, '\n');
   } else {
-    console.log('  AI credentials configured.\n');
+    const { isCliAuthAvailable } = require('./services/claude-ai');
+    if (isCliAuthAvailable()) {
+      console.log('  AI auth: Claude Code CLI session detected (will use `claude -p` subprocess).\n');
+    } else {
+      console.log('  Warning: No AI auth configured. Set ANTHROPIC_API_KEY in .env or run: claude auth login\n');
+    }
   }
 
   // Check product catalog

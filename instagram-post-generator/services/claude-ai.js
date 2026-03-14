@@ -5,24 +5,10 @@
  * and image generation prompts based on product data.
  */
 const Anthropic = require('@anthropic-ai/sdk');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const { execSync, spawn } = require('child_process');
 
 let client = null;
-
-function getClaudeCliToken() {
-  try {
-    const credPath = path.join(os.homedir(), '.claude', '.credentials.json');
-    const creds = JSON.parse(fs.readFileSync(credPath, 'utf-8'));
-    const oauth = creds.claudeAiOauth;
-    if (!oauth || !oauth.accessToken) return null;
-    if (oauth.expiresAt && Date.now() > oauth.expiresAt) return null;
-    return oauth.accessToken;
-  } catch {
-    return null;
-  }
-}
+let cliMode = false;
 
 function getClient() {
   if (!client) {
@@ -31,18 +17,73 @@ function getClient() {
 
     if (apiKey) {
       client = baseURL ? new Anthropic({ apiKey, baseURL }) : new Anthropic({ apiKey });
+    } else if (baseURL) {
+      client = new Anthropic({ apiKey: 'local-proxy', baseURL });
     } else {
-      const cliToken = getClaudeCliToken();
-      if (baseURL) {
-        client = new Anthropic({ apiKey: 'local-proxy', baseURL });
-      } else if (cliToken) {
-        client = new Anthropic({ apiKey: null, authToken: cliToken });
-      } else {
-        client = new Anthropic();
-      }
+      // No API key — we'll use the Claude CLI as a subprocess
+      cliMode = true;
+      client = 'cli';
     }
   }
   return client;
+}
+
+/**
+ * Call Claude via the CLI subprocess (for claude.ai auth users without an API key).
+ * Uses `claude -p` (print mode) which sends a single prompt and returns the response.
+ */
+async function callViaCli(systemPrompt, userMessage) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn('claude', [
+      '-p', userMessage,
+      '--output-format', 'json',
+      '--model', 'claude-sonnet-4-20250514',
+      '--max-turns', '1',
+    ], {
+      env: { ...process.env },
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: 120000,
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    proc.stdout.on('data', (d) => { stdout += d.toString(); });
+    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+
+    proc.on('close', (code) => {
+      if (code !== 0) {
+        return reject(new Error(`Claude CLI exited with code ${code}: ${stderr.slice(0, 500)}`));
+      }
+      try {
+        const parsed = JSON.parse(stdout);
+        resolve({
+          content: [{ text: parsed.result || parsed.content || stdout }],
+          usage: parsed.usage || { input_tokens: 0, output_tokens: 0 },
+        });
+      } catch {
+        // Raw text output
+        resolve({
+          content: [{ text: stdout.trim() }],
+          usage: { input_tokens: 0, output_tokens: 0 },
+        });
+      }
+    });
+
+    proc.on('error', (err) => reject(err));
+  });
+}
+
+/**
+ * Check if Claude CLI authentication is available.
+ */
+function isCliAuthAvailable() {
+  try {
+    const status = execSync('claude auth status 2>/dev/null', { encoding: 'utf-8', timeout: 5000 });
+    return status.includes('"loggedIn": true') || status.includes('"loggedIn":true');
+  } catch {
+    return false;
+  }
 }
 
 const SYSTEM_PROMPT = `You are an expert Instagram content creator and social media strategist for "Midnight Muse Made" — a handmade, witchy/goth-inspired small business on Shopify that sells custom acrylic earrings, drink stirrers, graduation pins, party sashes, pet patches, wood ornaments, glass tumblers, and other personalized items.
@@ -129,13 +170,20 @@ Please provide your response in this exact JSON format:
   "altText": "Accessible alt text describing the post image"
 }`;
 
-  const anthropic = getClient();
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4096,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: userMessage }],
-  });
+  const fullPrompt = `${SYSTEM_PROMPT}\n\n${userMessage}`;
+  let response;
+
+  const c = getClient();
+  if (cliMode) {
+    response = await callViaCli(SYSTEM_PROMPT, fullPrompt);
+  } else {
+    response = await c.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userMessage }],
+    });
+  }
 
   const text = response.content[0].text;
 
@@ -163,15 +211,7 @@ Please provide your response in this exact JSON format:
  * Regenerate just the caption with a different angle.
  */
 async function rewriteCaption(originalCaption, products, instructions) {
-  const anthropic = getClient();
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 2048,
-    system: SYSTEM_PROMPT,
-    messages: [
-      {
-        role: 'user',
-        content: `Here's an Instagram caption I generated but want to revise:
+  const userMsg = `Here's an Instagram caption I generated but want to revise:
 
 "${originalCaption}"
 
@@ -179,10 +219,20 @@ Products featured: ${products.map((p) => p.title).join(', ')}
 
 Please rewrite it with these changes: ${instructions}
 
-Return ONLY the new caption text (with emojis and \\n for line breaks), no JSON wrapping.`,
-      },
-    ],
-  });
+Return ONLY the new caption text (with emojis and \\n for line breaks), no JSON wrapping.`;
+
+  let response;
+  const c = getClient();
+  if (cliMode) {
+    response = await callViaCli(SYSTEM_PROMPT, `${SYSTEM_PROMPT}\n\n${userMsg}`);
+  } else {
+    response = await c.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2048,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userMsg }],
+    });
+  }
 
   return {
     caption: response.content[0].text,
@@ -192,13 +242,19 @@ Return ONLY the new caption text (with emojis and \\n for line breaks), no JSON 
 
 async function testConnection() {
   try {
-    const anthropic = getClient();
-    const response = await anthropic.messages.create({
+    const c = getClient();
+    if (cliMode) {
+      const available = isCliAuthAvailable();
+      return available
+        ? { connected: true, response: 'connected (Claude CLI)', method: 'cli' }
+        : { connected: false, error: 'Claude CLI not authenticated. Run: claude auth login' };
+    }
+    const response = await c.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 50,
       messages: [{ role: 'user', content: 'Reply with "connected" and nothing else.' }],
     });
-    return { connected: true, response: response.content[0].text };
+    return { connected: true, response: response.content[0].text, method: 'api' };
   } catch (err) {
     return { connected: false, error: err.message };
   }
@@ -208,4 +264,5 @@ module.exports = {
   generatePost,
   rewriteCaption,
   testConnection,
+  isCliAuthAvailable,
 };
