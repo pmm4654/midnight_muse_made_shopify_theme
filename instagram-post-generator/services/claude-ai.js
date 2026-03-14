@@ -34,15 +34,15 @@ function getClient() {
  */
 async function callViaCli(systemPrompt, userMessage) {
   return new Promise((resolve, reject) => {
+    // Pipe prompt via stdin to avoid shell argument length limits
     const proc = spawn('claude', [
-      '-p', userMessage,
+      '-p',
       '--output-format', 'json',
       '--model', 'claude-sonnet-4-20250514',
       '--max-turns', '1',
     ], {
       env: { ...process.env },
       stdio: ['pipe', 'pipe', 'pipe'],
-      timeout: 120000,
     });
 
     let stdout = '';
@@ -51,8 +51,15 @@ async function callViaCli(systemPrompt, userMessage) {
     proc.stdout.on('data', (d) => { stdout += d.toString(); });
     proc.stderr.on('data', (d) => { stderr += d.toString(); });
 
+    // Set a 2 minute timeout
+    const timer = setTimeout(() => {
+      proc.kill('SIGTERM');
+      reject(new Error('Claude CLI timed out after 120 seconds'));
+    }, 120000);
+
     proc.on('close', (code) => {
-      if (code !== 0) {
+      clearTimeout(timer);
+      if (code !== 0 && code !== null) {
         return reject(new Error(`Claude CLI exited with code ${code}: ${stderr.slice(0, 500)}`));
       }
       try {
@@ -62,7 +69,6 @@ async function callViaCli(systemPrompt, userMessage) {
           usage: parsed.usage || { input_tokens: 0, output_tokens: 0 },
         });
       } catch {
-        // Raw text output
         resolve({
           content: [{ text: stdout.trim() }],
           usage: { input_tokens: 0, output_tokens: 0 },
@@ -70,7 +76,14 @@ async function callViaCli(systemPrompt, userMessage) {
       }
     });
 
-    proc.on('error', (err) => reject(err));
+    proc.on('error', (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
+
+    // Write the prompt to stdin and close it
+    proc.stdin.write(userMessage);
+    proc.stdin.end();
   });
 }
 
