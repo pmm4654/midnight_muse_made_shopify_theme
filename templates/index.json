@@ -45,7 +45,7 @@
       ],
       "settings": {
         "image": "shopify://shop_images/ProductFlayLayHeaderImage-Thinner.png",
-        "image_overlay_opacity": 70,
+        "image_overlay_opacity": 30,
         "image_height": "small",
         "image_behavior": "none",
         "desktop_content_position": "middle-center",

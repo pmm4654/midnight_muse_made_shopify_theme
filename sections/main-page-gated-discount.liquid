@@ -13,40 +13,17 @@
     }
   }
 
-  .discount-gate__hidden {
-    display: none;
-  }
-
-  .discount-gate__placeholder {
-    background: rgba(212, 165, 116, 0.12);
-    border: 2px dashed rgba(212, 165, 116, 0.6);
-    border-radius: 12px;
-    padding: 2rem;
-    text-align: center;
-    margin: 1.5rem 0;
-  }
-
-  .discount-gate__placeholder p {
-    margin: 0;
-    font-size: 16px;
-    color: rgba(var(--color-foreground), 1);
-  }
-
   .main-page-title {
     text-align: center;
+    font-size: calc(var(--font-heading-scale) * 3.6rem);
   }
 
-  #gated-page-content .rte p {
+  .page-content .rte p {
     color: rgba(var(--color-foreground), 1);
   }
 
-  .discount-gate__revealed {
-    animation: discountReveal 0.5s ease-out;
-  }
-
-  @keyframes discountReveal {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+  .section-{{ section.id }}-padding + .shopify-section {
+    padding-top: 48px;
   }
 {%- endstyle -%}
 
@@ -54,186 +31,10 @@
   <h1 class="main-page-title page-title h0{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
     {{ page.title | escape }}
   </h1>
-  <div class="rte{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" id="gated-page-content">
+  <div class="rte page-content{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
     {{ page.content }}
   </div>
 </div>
-
-<script>
-  (function run() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', run);
-      return;
-    }
-    var STORAGE_KEY = 'discount_gate_subscribed';
-    var content = document.getElementById('gated-page-content');
-    if (!content) return;
-
-    var alreadySubscribed = false;
-    try { alreadySubscribed = localStorage.getItem(STORAGE_KEY) === 'true'; } catch(e) {}
-
-    if (alreadySubscribed) return;
-
-    // The CMS content has a known structure:
-    // - A div with the FIRST13 button (the discount code block with purple bg)
-    // - An h3 "How It Works" followed by a div containing an ol
-    var codeButton = content.querySelector('button');
-    var elementsToHide = [];
-
-    // Find the discount code block: the div containing the button
-    if (codeButton) {
-      var discountBlock = codeButton.parentElement;
-      if (discountBlock) {
-        elementsToHide.push(discountBlock);
-      }
-    }
-
-    // Find "How It Works" heading and its list
-    content.querySelectorAll('h3').forEach(function(h3) {
-      if (h3.textContent.trim() === 'How It Works') {
-        elementsToHide.push(h3);
-        var next = h3.nextElementSibling;
-        if (next) elementsToHide.push(next);
-      }
-    });
-
-    if (elementsToHide.length === 0) return;
-
-    // Hide elements
-    elementsToHide.forEach(function(el) {
-      el.classList.add('discount-gate__hidden');
-    });
-
-    // Insert placeholder where the discount block was
-    var firstHidden = elementsToHide[0];
-    var placeholder = document.createElement('div');
-    placeholder.className = 'discount-gate__placeholder';
-    placeholder.id = 'discount-gate-placeholder';
-    placeholder.innerHTML = '<p><strong>Subscribe below to reveal your exclusive discount code!</strong></p>';
-    firstHidden.parentNode.insertBefore(placeholder, firstHidden);
-
-    // Create an anchor to relocate the forms section inline, right after the placeholder
-    var formAnchor = document.createElement('div');
-    formAnchor.id = 'discount-gate-form-anchor';
-    placeholder.parentNode.insertBefore(formAnchor, placeholder.nextSibling);
-
-    // Move the Shopify Forms app section into the anchor
-    var formsSection = document.querySelector('[id*="shopify-section"][id*="forms"]') ||
-                       document.querySelector('.shopify-section [data-forms-id]');
-    if (formsSection) {
-      // Get the full section wrapper
-      var sectionWrapper = formsSection.closest('.shopify-section') || formsSection;
-      formAnchor.appendChild(sectionWrapper);
-    } else {
-      // Forms section may not have loaded yet; watch for it
-      var formRelocObserver = new MutationObserver(function(mutations) {
-        for (var i = 0; i < mutations.length; i++) {
-          for (var j = 0; j < mutations[i].addedNodes.length; j++) {
-            var node = mutations[i].addedNodes[j];
-            if (node.nodeType !== 1) continue;
-            var isFormsSection = (node.id && node.id.indexOf('forms') !== -1 && node.classList && node.classList.contains('shopify-section')) ||
-                                 (node.querySelector && node.querySelector('[data-forms-id]'));
-            if (isFormsSection) {
-              var wrapper = node.closest('.shopify-section') || node;
-              formAnchor.appendChild(wrapper);
-              formRelocObserver.disconnect();
-              return;
-            }
-          }
-        }
-      });
-      formRelocObserver.observe(document.body, { childList: true, subtree: true });
-      setTimeout(function() { formRelocObserver.disconnect(); }, 30000);
-    }
-
-    function revealDiscount() {
-      try { localStorage.setItem(STORAGE_KEY, 'true'); } catch(e) {}
-
-      var ph = document.getElementById('discount-gate-placeholder');
-      if (ph) ph.remove();
-
-      // Hide the form anchor (form no longer needed once code is revealed)
-      var anchor = document.getElementById('discount-gate-form-anchor');
-      if (anchor) anchor.style.display = 'none';
-
-      content.querySelectorAll('.discount-gate__hidden').forEach(function(el) {
-        el.classList.remove('discount-gate__hidden');
-        el.classList.add('discount-gate__revealed');
-      });
-    }
-
-    var revealed = false;
-
-    function attachFormListener(formEmbed) {
-      if (!formEmbed || !formEmbed.shadowRoot) return false;
-      var shadow = formEmbed.shadowRoot;
-      var form = shadow.querySelector('form');
-      if (!form) return false;
-
-      // Primary: watch for the <form> element to be removed from shadow DOM
-      // (Shopify Forms replaces it with a success/thank-you message on success)
-      var shadowObserver = new MutationObserver(function() {
-        if (revealed) return;
-        var formStillExists = shadow.querySelector('form');
-        if (!formStillExists) {
-          revealed = true;
-          revealDiscount();
-          shadowObserver.disconnect();
-        }
-      });
-      shadowObserver.observe(shadow, { childList: true, subtree: true });
-
-      return true;
-    }
-
-    // Strategy 1: Attach submit listener to Shopify Forms <form-embed> shadow DOM
-    var formEmbed = document.querySelector('form-embed');
-    if (formEmbed) {
-      if (!attachFormListener(formEmbed)) {
-        // shadowRoot not ready yet, watch for it
-        var embedObserver = new MutationObserver(function() {
-          if (formEmbed.shadowRoot && attachFormListener(formEmbed)) {
-            embedObserver.disconnect();
-          }
-        });
-        embedObserver.observe(formEmbed, { childList: true, subtree: true });
-      }
-    }
-
-    // Strategy 2: Wait for <form-embed> to appear if not yet in DOM
-    if (!formEmbed) {
-      var bodyObserver = new MutationObserver(function(mutations) {
-        for (var i = 0; i < mutations.length; i++) {
-          for (var j = 0; j < mutations[i].addedNodes.length; j++) {
-            var node = mutations[i].addedNodes[j];
-            if (node.nodeType !== 1) continue;
-            var embed = node.tagName === 'FORM-EMBED' ? node : node.querySelector && node.querySelector('form-embed');
-            if (embed && attachFormListener(embed)) {
-              bodyObserver.disconnect();
-              return;
-            }
-          }
-        }
-      });
-      bodyObserver.observe(document.body, { childList: true, subtree: true });
-      // Stop waiting after 30 seconds
-      setTimeout(function() { bodyObserver.disconnect(); }, 30000);
-    }
-
-    // Strategy 3: Listen for postMessage as fallback (some form integrations use this)
-    window.addEventListener('message', function(event) {
-      if (revealed) return;
-      try {
-        var data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        if (data && (data.type === 'form_submitted' || data.type === 'form_success' ||
-            data.event === 'form_submitted' || data.submitted === true)) {
-          revealed = true;
-          revealDiscount();
-        }
-      } catch(e) {}
-    });
-  })();
-</script>
 
 {% schema %}
 {

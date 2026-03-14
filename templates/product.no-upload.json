@@ -34,18 +34,6 @@
             "swatch_shape": "circle"
           }
         },
-        "uploadery_app_block_GFhTGm": {
-          "type": "shopify://apps/uploadery/blocks/app-block/5253cb5d-9d0f-47bd-a1aa-51cb83bf6de3",
-          "settings": {}
-        },
-        "photo_guide": {
-          "type": "collapsible_tab",
-          "settings": {
-            "heading": "What Makes a Purrfect Photo?",
-            "icon": "paw_print",
-            "content": "<p><strong>Good lighting is everything</strong><br>Natural light works best — snap your photo near a window or outdoors. Avoid harsh flash, which can wash out your familiar's beautiful features.</p><p><strong>Let us see that face</strong><br>Make sure your pet's eyes, nose, and ears are clearly visible. Front-facing or a slight angle works great — no hiding behind the couch!</p><p><strong>One spooky companion per photo</strong><br>If you have multiple pets, send a separate photo of each one so we can capture their unique spirit.</p><p><strong>File types we accept</strong><br>JPG, PNG, or HEIC. The higher the resolution, the more detail we can conjure into your portrait.</p><p><strong>Don't worry — we enhance every image by hand</strong><br>Our artists lovingly adjust lighting, colour, and composition. Even if your photo isn't studio-quality, we'll make it magical.</p>"
-          }
-        },
         "quantity_selector": {
           "type": "quantity_selector",
           "settings": {}
@@ -66,7 +54,7 @@
           "settings": {
             "heading": "Frequently Asked Questions",
             "icon": "question_mark",
-            "content": "<p><strong>What if my photo doesn't look good enough?</strong><br>No worries at all! Our artists enhance every image by hand. As long as your pet's face is visible, we can work our magic.</p><p><strong>Can I see a proof before it ships?</strong><br>We're a small coven crafting each piece with care. While we don't offer proofs, if you're not completely enchanted with your order, we'll remake it — that's our promise.</p><p><strong>How long does it take?</strong><br>Most orders ship within 5–7 business days. Each piece is conjured to order, so please allow a little extra time during busy spells.</p><p><strong>What if I don't like it?</strong><br>We want you to love your piece! If something isn't right, reach out and we'll make it right — remake or refund, no hexes involved.</p><p><strong>Can I order for multiple pets?</strong><br>Absolutely! Add each pet as a separate item with their own photo. Want a group portrait? Message us and we'll cast a special spell.</p>"
+            "content": "<p><strong>How long does shipping take?</strong><br>Most orders ship within 5–7 business days. Each piece is conjured to order, so please allow a little extra time during busy spells.</p><p><strong>What if I don't like it?</strong><br>We want you to love your piece! If something isn't right, reach out and we'll make it right — remake or refund, no hexes involved.</p><p><strong>Is this item handmade?</strong><br>Every piece is crafted with care by our small coven. No mass production, no shortcuts — just quality work made with love and a little bit of magic.</p><p><strong>Can I order this as a gift?</strong><br>Absolutely! We can ship directly to your recipient. Add a gift message at checkout and we'll include it with the order.</p>"
           }
         },
         "from_the_maker": {
@@ -74,7 +62,7 @@
           "settings": {
             "heading": "A Note from the Maker",
             "icon": "heart",
-            "content": "<p>Hi there, fellow creature of the night! I'm the human behind Midnight Muse Made, and every single piece you see here is crafted with love, a little bit of magic, and way too much coffee.</p><p>I started this shop because I believe our pets deserve to be immortalised in art that's as unique as they are. Each portrait is hand-finished — no two are ever exactly alike, just like your familiar.</p><p>When you order from here, you're not just buying a product. You're supporting a small, independent maker who genuinely cares about getting every whisker, every floppy ear, and every soulful gaze just right.</p><p>Thank you for being part of this little coven. Stay strange. Stay spooky.</p>"
+            "content": "<p>Hi there, fellow creature of the night! I'm the human behind Midnight Muse Made, and every single piece you see here is crafted with love, a little bit of magic, and way too much coffee.</p><p>When you order from here, you're not just buying a product. You're supporting a small, independent maker who genuinely cares about quality and getting every detail just right.</p><p>Thank you for being part of this little coven. Stay strange. Stay spooky.</p>"
           }
         },
         "share": {
@@ -89,8 +77,6 @@
         "title",
         "price",
         "variant_picker",
-        "uploadery_app_block_GFhTGm",
-        "photo_guide",
         "quantity_selector",
         "buy_buttons",
         "description",

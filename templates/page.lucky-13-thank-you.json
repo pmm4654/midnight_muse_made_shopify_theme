@@ -1,0 +1,61 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page-lucky13-thankyou",
+      "settings": {
+        "color_scheme": "scheme-purple-accent",
+        "heading": "The Circle is Nearly Complete",
+        "subtitle": "You've claimed your place.",
+        "body_text": "<p>You've claimed your place among the Lucky 13. Your <strong>50% discount code<\/strong> is flying to your inbox right now — conjured just for you.<\/p><p>While you wait, feast your eyes on what your enchantment could conjure...<\/p>",
+        "email_subject_hint": "Your 50% Spell Has Been Cast",
+        "show_share_links": true,
+        "share_heading": "Know another creature of the night? Tell them before the spots vanish.",
+        "show_browse_cta": true,
+        "browse_text": "See what your 50% off could conjure:",
+        "browse_button_label": "Browse the Collection",
+        "browse_link": "/collections/all"
+      }
+    },
+    "featured-products": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Your Enchantment Awaits",
+        "heading_size": "h1",
+        "description": "",
+        "show_description": false,
+        "description_style": "body",
+        "collection": "featured-products",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "full_width": false,
+        "show_view_all": true,
+        "view_all_style": "solid",
+        "enable_desktop_slider": false,
+        "color_scheme": "scheme-dark-main",
+        "image_ratio": "adapt",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "none",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "padding_top": 36,
+        "padding_bottom": 52
+      }
+    }
+  },
+  "order": [
+    "main",
+    "featured-products"
+  ]
+}

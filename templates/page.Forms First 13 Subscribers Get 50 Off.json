@@ -9,9 +9,21 @@
  */
 {
   "sections": {
-    "17e05c28-20e3-479a-9552-0aea612e8c7b": {
-      "type": "main-page-gated-discount",
-      "settings": {}
+    "main": {
+      "type": "main-page-lucky13-signup",
+      "settings": {
+        "color_scheme": "scheme-purple-accent",
+        "heading_line_1": "The 13th Hour Approaches",
+        "heading_number": "Only 13 Souls",
+        "subtitle": "We're summoning exactly 13 souls for something special.",
+        "offer_details": "<p>The first 13 to join our coven get <strong>50% off<\/strong> their first custom pet portrait — a one-time enchantment that won't be cast again. Once all 13 spots are claimed, the portal closes forever.<\/p>",
+        "trust_text": "Your email stays in the coven. No spam, no hexes — just the good stuff.",
+        "show_candles": true,
+        "spots_claimed": 0,
+        "scarcity_text": "Only 13 spots. No exceptions. No encores.",
+        "padding_top": 52,
+        "padding_bottom": 20
+      }
     },
     "forms": {
       "type": "apps",
@@ -34,7 +46,7 @@
     }
   },
   "order": [
-    "17e05c28-20e3-479a-9552-0aea612e8c7b",
+    "main",
     "forms"
   ]
 }

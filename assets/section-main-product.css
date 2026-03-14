@@ -1082,7 +1082,7 @@ a.product__text {
 }
 
 .product__modal-opener .path {
-  stroke: rgb(var(--color-button));
+  stroke: rgb(var(--color-foreground));
   opacity: 0.75;
 }
 
