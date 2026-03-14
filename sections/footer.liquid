@@ -165,7 +165,7 @@
             data-cascade
           {% endif %}
         >
-          {%- if section.settings.newsletter_enable and page.template_suffix != 'Forms First 13 Subscribers Get 50 Off' -%}
+          {%- if section.settings.newsletter_enable and page.template_suffix != 'Forms First 13 Subscribers Get 50 Off' and page.template_suffix != 'page-with-form' and page.template_suffix != 'lucky-13-thank-you' -%}
             <div class="footer-block__newsletter">
               {%- if section.settings.newsletter_heading != blank -%}
                 <h2 class="footer-block__heading inline-richtext">{{ section.settings.newsletter_heading }}</h2>

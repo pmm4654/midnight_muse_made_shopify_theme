@@ -1,0 +1,269 @@
+{{ 'section-main-page.css' | asset_url | stylesheet_tag }}
+{%- comment -%}Lucky 13 signup section{%- endcomment -%}
+
+{%- style -%}
+  .lucky13-signup {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    text-align: center;
+  }
+
+  @media screen and (min-width: 750px) {
+    .lucky13-signup {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .lucky13-signup__header {
+    max-width: 680px;
+    margin: 0 auto 2rem;
+  }
+
+  .lucky13-signup__title {
+    font-size: calc(var(--font-heading-scale) * 3.2rem);
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+  }
+
+  @media screen and (min-width: 750px) {
+    .lucky13-signup__title {
+      font-size: calc(var(--font-heading-scale) * 4.8rem);
+    }
+  }
+
+  .lucky13-signup__number {
+    display: block;
+    font-size: 1.4em;
+    color: rgba(var(--color-button), 1);
+  }
+
+  .lucky13-signup__subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  @media screen and (min-width: 750px) {
+    .lucky13-signup__subtitle {
+      font-size: 1.4rem;
+    }
+  }
+
+  .lucky13-signup__scarcity {
+    display: inline-block;
+    padding: 0.6rem 1.5rem;
+    border: 2px solid rgba(var(--color-button), 0.6);
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    color: rgba(var(--color-button), 1);
+  }
+
+  .lucky13-signup__candles {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .lucky13-signup__candle {
+    font-size: 1.6rem;
+    transition: opacity 0.3s;
+  }
+
+  .lucky13-signup__candle--claimed {
+    opacity: 0.25;
+    filter: grayscale(1);
+  }
+
+  .lucky13-signup__offer {
+    max-width: 560px;
+    margin: 0 auto 2rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+
+  .lucky13-signup__offer strong {
+    color: rgba(var(--color-button), 1);
+  }
+
+  .lucky13-signup__trust {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    font-style: italic;
+    margin-top: 1.5rem;
+  }
+
+  .lucky13-signup__divider {
+    width: 60px;
+    height: 2px;
+    background: rgba(var(--color-button), 0.4);
+    margin: 2rem auto;
+    border: none;
+  }
+
+  .lucky13-signup + .shopify-section {
+    padding-top: 2rem;
+  }
+{%- endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width lucky13-signup">
+    <div class="lucky13-signup__header{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+      <h1 class="lucky13-signup__title">
+        {{ section.settings.heading_line_1 }}
+        <span class="lucky13-signup__number">{{ section.settings.heading_number }}</span>
+      </h1>
+    </div>
+
+    {%- if section.settings.show_candles -%}
+      <div class="lucky13-signup__candles{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+        aria-label="{{ section.settings.spots_claimed }} of 13 spots claimed">
+        {%- for i in (1..13) -%}
+          {%- if i <= section.settings.spots_claimed -%}
+            <span class="lucky13-signup__candle lucky13-signup__candle--claimed" aria-hidden="true">&#x1F56F;</span>
+          {%- else -%}
+            <span class="lucky13-signup__candle" aria-hidden="true">&#x1F56F;</span>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.scarcity_text != blank -%}
+      <div class="lucky13-signup__scarcity{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        {{ section.settings.scarcity_text }}
+      </div>
+    {%- endif -%}
+
+    <div class="lucky13-signup__offer{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+      <p class="lucky13-signup__subtitle">{{ section.settings.subtitle }}</p>
+      <p>{{ section.settings.offer_details }}</p>
+    </div>
+
+    {%- comment -%} The page.content renders any RTE content set in Shopify Admin {%- endcomment -%}
+    {%- if page.content != blank -%}
+      <div class="rte page-content">
+        {{ page.content }}
+      </div>
+    {%- endif -%}
+
+    <hr class="lucky13-signup__divider">
+
+    {%- if section.settings.trust_text != blank -%}
+      <p class="lucky13-signup__trust{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        {{ section.settings.trust_text }}
+      </p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Lucky 13 Signup",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-purple-accent"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading_line_1",
+      "label": "Heading text",
+      "default": "The 13th Hour Approaches"
+    },
+    {
+      "type": "text",
+      "id": "heading_number",
+      "label": "Heading number/emphasis",
+      "default": "Only 13 Souls"
+    },
+    {
+      "type": "header",
+      "content": "Copy"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "We're summoning exactly 13 souls for something special."
+    },
+    {
+      "type": "richtext",
+      "id": "offer_details",
+      "label": "Offer details",
+      "default": "<p>The first 13 to join our coven get <strong>50% off</strong> their first custom pet portrait — a one-time enchantment that won't be cast again. Once all 13 spots are claimed, the portal closes forever.</p>"
+    },
+    {
+      "type": "text",
+      "id": "trust_text",
+      "label": "Trust text",
+      "default": "Your email stays in the coven. No spam, no hexes — just the good stuff."
+    },
+    {
+      "type": "header",
+      "content": "Scarcity"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_candles",
+      "label": "Show candle counter",
+      "default": true,
+      "info": "Visual counter showing 13 candles. Claimed spots appear dimmed."
+    },
+    {
+      "type": "range",
+      "id": "spots_claimed",
+      "min": 0,
+      "max": 13,
+      "step": 1,
+      "label": "Spots claimed",
+      "default": 0,
+      "info": "Manually update as spots are claimed. Dims that many candles."
+    },
+    {
+      "type": "text",
+      "id": "scarcity_text",
+      "label": "Scarcity badge text",
+      "default": "Only 13 spots. No exceptions. No encores."
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 20
+    }
+  ]
+}
+{% endschema %}
