@@ -5,17 +5,31 @@ const { loadProducts } = require('../services/product-catalog');
 
 router.get('/', async (req, res) => {
   const aiStatus = await testConnection();
-  let productCount = 0;
+
+  const sources = {};
+  // Always check CSV (fast, local)
   try {
-    productCount = loadProducts().length;
+    const csvProducts = await loadProducts('csv');
+    sources.csv = { available: true, productCount: csvProducts.length };
   } catch (e) {
-    // CSV not found or parse error
+    sources.csv = { available: false, error: e.message };
   }
 
+  // Check if Shopify Admin API is configured
+  sources.shopify = {
+    configured: !!(process.env.SHOPIFY_ACCESS_TOKEN && (process.env.SHOPIFY_STORE_DOMAIN || process.env.MYSHOPIFY_DOMAIN)),
+  };
+
+  // Website is always potentially available
+  sources.website = { available: true };
+
+  const anyProducts = sources.csv.available && sources.csv.productCount > 0;
+
   res.json({
-    status: aiStatus.connected && productCount > 0 ? 'ready' : 'degraded',
+    status: aiStatus.connected && anyProducts ? 'ready' : 'degraded',
     ai: aiStatus,
-    catalog: { productCount },
+    sources,
+    catalog: { productCount: sources.csv.productCount || 0 },
   });
 });
 

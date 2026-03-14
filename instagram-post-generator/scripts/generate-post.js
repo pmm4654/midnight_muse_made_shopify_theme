@@ -3,10 +3,17 @@
  * CLI script to generate an Instagram post without the web server.
  *
  * Usage:
- *   node scripts/generate-post.js                     # random products
- *   node scripts/generate-post.js --seasonal          # seasonal picks
- *   node scripts/generate-post.js --count 3           # pick 3 products
+ *   node scripts/generate-post.js                           # CSV source, random
+ *   node scripts/generate-post.js --source website          # scrape live site
+ *   node scripts/generate-post.js --source shopify          # Shopify Admin API
+ *   node scripts/generate-post.js --seasonal                # seasonal picks
+ *   node scripts/generate-post.js --count 3                 # pick 3 products
  *   node scripts/generate-post.js --type sale_announcement --mood dark_glamour
+ *
+ * Sources:
+ *   csv      — Local CSV export (default, no auth needed)
+ *   website  — Scrape midnightmusemade.com public storefront
+ *   shopify  — Shopify Admin API (requires SHOPIFY_ACCESS_TOKEN + SHOPIFY_STORE_DOMAIN)
  */
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 
@@ -23,16 +30,22 @@ async function main() {
     }
   }
 
+  const source = flags.source || 'csv';
   const strategy = flags.seasonal ? 'seasonal' : flags.featured ? 'featured' : 'random';
   const count = parseInt(flags.count) || 2;
   const postType = flags.type || 'product_spotlight';
   const mood = flags.mood || 'witchy_cozy';
 
-  console.log(`\nPicking ${count} products (strategy: ${strategy})...\n`);
-  const products = pickProducts(count, strategy);
+  console.log(`\nSource: ${source}`);
+  console.log(`Picking ${count} products (strategy: ${strategy})...\n`);
+
+  const products = await pickProducts(count, strategy, source);
 
   if (products.length === 0) {
-    console.error('No products found. Check that products_export_fresh_import.csv exists.');
+    console.error('No products found. Check your source configuration.');
+    if (source === 'shopify') {
+      console.error('  Ensure SHOPIFY_ACCESS_TOKEN and SHOPIFY_STORE_DOMAIN are set.');
+    }
     process.exit(1);
   }
 

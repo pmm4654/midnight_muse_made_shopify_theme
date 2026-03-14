@@ -305,6 +305,14 @@
     <div class="panel">
       <h2>Configure Post</h2>
 
+      <label>Data Source</label>
+      <select id="dataSource" onchange="onSourceChange()">
+        <option value="csv">Local CSV Export (fast, offline)</option>
+        <option value="website">Live Website (scrape midnightmusemade.com)</option>
+        <option value="shopify">Shopify Admin API (requires token)</option>
+      </select>
+      <div id="sourceNote" class="tips" style="margin-top:0.4rem;padding:0.5rem;font-size:0.8rem;display:none"></div>
+
       <label>Product Selection</label>
       <select id="selectionMode">
         <option value="random">Random picks</option>
@@ -369,13 +377,14 @@
   <script>
     let allProducts = [];
     let selectedHandles = new Set();
+    let currentSource = 'csv';
 
     // Check health & load products on startup
     async function init() {
       try {
         const [healthRes, productsRes] = await Promise.all([
           fetch('/api/health').then(r => r.json()),
-          fetch('/api/posts/products').then(r => r.json()),
+          fetch('/api/posts/products?source=csv').then(r => r.json()),
         ]);
 
         const statusEl = document.getElementById('statusText');
@@ -386,10 +395,56 @@
           statusEl.textContent = `Degraded — AI: ${healthRes.ai.connected ? 'OK' : 'disconnected'}`;
         }
 
+        // Show Shopify API availability
+        if (healthRes.sources?.shopify?.configured) {
+          document.querySelector('#dataSource option[value="shopify"]').textContent =
+            'Shopify Admin API (connected)';
+        }
+
         allProducts = productsRes.products || [];
         renderProductPicker();
       } catch (e) {
         document.getElementById('statusText').textContent = 'Error loading';
+      }
+    }
+
+    async function onSourceChange() {
+      const source = document.getElementById('dataSource').value;
+      const noteEl = document.getElementById('sourceNote');
+      currentSource = source;
+
+      const notes = {
+        csv: '',
+        website: 'Fetches products live from midnightmusemade.com public storefront. May be slower than CSV.',
+        shopify: 'Uses Shopify Admin API. Requires SHOPIFY_ACCESS_TOKEN and SHOPIFY_STORE_DOMAIN in .env file.',
+      };
+
+      if (notes[source]) {
+        noteEl.textContent = notes[source];
+        noteEl.style.display = '';
+      } else {
+        noteEl.style.display = 'none';
+      }
+
+      // Reload product list from new source
+      const picker = document.getElementById('productPicker');
+      picker.innerHTML = '<div class="loading"><div class="spinner"></div>Loading products...</div>';
+
+      try {
+        const res = await fetch(`/api/posts/products?source=${source}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        allProducts = data.products || [];
+        selectedHandles.clear();
+        renderProductPicker();
+
+        const statusEl = document.getElementById('statusText');
+        statusEl.textContent = `${source.toUpperCase()} — ${allProducts.length} products`;
+        statusEl.className = 'status ready';
+      } catch (e) {
+        picker.innerHTML = `<div class="error" style="margin:0.5rem">${escapeHtml(e.message)}</div>`;
+        document.getElementById('statusText').textContent = `${source}: error`;
+        document.getElementById('statusText').className = 'status';
       }
     }
 
@@ -436,6 +491,8 @@
         includeImagePrompt: document.getElementById('includeImagePrompt').value === 'true',
         customInstructions: document.getElementById('customInstructions').value,
       };
+
+      body.source = currentSource;
 
       if (mode === 'manual') {
         body.productHandles = Array.from(selectedHandles);

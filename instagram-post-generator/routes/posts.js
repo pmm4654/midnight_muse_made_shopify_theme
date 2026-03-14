@@ -4,10 +4,13 @@ const { loadProducts, pickProducts } = require('../services/product-catalog');
 const { generatePost, rewriteCaption } = require('../services/claude-ai');
 
 // GET /api/posts/products — list all products
-router.get('/products', (req, res) => {
+// Query params: ?source=csv|website|shopify
+router.get('/products', async (req, res) => {
   try {
-    const products = loadProducts();
+    const source = req.query.source || 'csv';
+    const products = await loadProducts(source);
     res.json({
+      source,
       count: products.length,
       products: products.map((p) => ({
         handle: p.handle,
@@ -28,9 +31,10 @@ router.get('/products', (req, res) => {
 router.post('/generate', async (req, res) => {
   try {
     const {
-      productHandles,    // optional: specific products to feature
-      count = 2,         // how many products to pick if no handles specified
-      strategy = 'random', // 'random', 'seasonal', 'featured'
+      productHandles,
+      count = 2,
+      strategy = 'random',
+      source = 'csv',       // 'csv', 'website', or 'shopify'
       postType = 'product_spotlight',
       mood = 'witchy_cozy',
       includeImagePrompt = true,
@@ -39,13 +43,13 @@ router.post('/generate', async (req, res) => {
 
     let products;
     if (productHandles && productHandles.length > 0) {
-      const all = loadProducts();
+      const all = await loadProducts(source);
       products = all.filter((p) => productHandles.includes(p.handle));
       if (products.length === 0) {
         return res.status(400).json({ error: 'None of the specified product handles were found' });
       }
     } else {
-      products = pickProducts(count, strategy);
+      products = await pickProducts(count, strategy, source);
     }
 
     if (products.length === 0) {

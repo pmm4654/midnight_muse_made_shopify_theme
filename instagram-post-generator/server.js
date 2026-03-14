@@ -54,11 +54,13 @@ app.listen(PORT, () => {
   }
 
   // Check product catalog
-  try {
-    const { loadProducts } = require('./services/product-catalog');
-    const count = loadProducts().length;
-    console.log(`  Product catalog loaded: ${count} active products.\n`);
-  } catch (e) {
-    console.log('  Warning: Could not load product catalog:', e.message, '\n');
-  }
+  (async () => {
+    try {
+      const { loadProducts } = require('./services/product-catalog');
+      const count = (await loadProducts('csv')).length;
+      console.log(`  Product catalog loaded: ${count} active products.\n`);
+    } catch (e) {
+      console.log('  Warning: Could not load product catalog:', e.message, '\n');
+    }
+  })();
 });
