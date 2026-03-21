@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 3457;
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/screenshots', express.static(path.join(__dirname, 'screenshots')));
 
 // API Routes
 app.use('/api/posts', postRoutes);
@@ -47,4 +48,17 @@ app.listen(PORT, () => {
       console.log('  Warning: Could not load product catalog:', e.message, '\n');
     }
   })();
+
+  // Check Meta Business Suite session
+  try {
+    const { checkSession } = require('./services/meta-publisher');
+    const session = checkSession();
+    if (session.valid) {
+      console.log('  Meta Business Suite: session active\n');
+    } else {
+      console.log(`  Meta Business Suite: ${session.reason}\n`);
+    }
+  } catch (e) {
+    console.log('  Meta Business Suite: not configured\n');
+  }
 });

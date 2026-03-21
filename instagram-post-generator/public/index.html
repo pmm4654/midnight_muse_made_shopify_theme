@@ -345,12 +345,101 @@
       font-size: 0.9rem;
       margin-top: 1rem;
     }
+    .publish-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .publish-section h3 {
+      margin-bottom: 1rem;
+    }
+
+    .publish-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: flex-end;
+    }
+
+    .publish-controls .field {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .publish-controls label {
+      margin-top: 0;
+    }
+
+    .session-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 12px;
+      margin-bottom: 0.8rem;
+    }
+
+    .session-status.valid {
+      background: rgba(78, 205, 196, 0.15);
+      color: var(--success);
+    }
+
+    .session-status.invalid {
+      background: rgba(233, 69, 96, 0.15);
+      color: var(--accent);
+    }
+
+    .preview-image {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 0.8rem;
+      border: 1px solid var(--border);
+    }
+
+    .publish-result {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .publish-result.success {
+      background: rgba(78, 205, 196, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .publish-result.error {
+      background: rgba(233, 69, 96, 0.1);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    button.publish-btn {
+      background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+      font-weight: 600;
+    }
+
+    button.confirm-btn {
+      background: var(--success);
+      color: var(--bg);
+      font-weight: 600;
+    }
+
+    .schedule-input {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Instagram Post Generator</h1>
     <span class="status" id="statusText">Checking...</span>
+    <span class="session-status invalid" id="sessionStatus" title="Meta Business Suite session">Meta: checking...</span>
   </header>
 
   <div class="container">
@@ -708,6 +797,39 @@
           </div>`;
       }
 
+      // Publish to Instagram section
+      html += `
+        <div class="publish-section">
+          <h3>Publish to Instagram</h3>
+          <div id="publishSessionStatus"></div>
+          <div class="publish-controls">
+            <div class="field">
+              <label>Image for Post</label>
+              <select id="publishImageSelect" onchange="toggleCustomImageUrl(this)">
+                ${(post.suggestedImages || []).map((img, i) => {
+                  const product = data.products.find(p => p.title === img.productTitle);
+                  const imgSrc = product?.images?.[img.imageIndex - 1]?.src || '';
+                  return `<option value="${imgSrc}">${escapeHtml(img.productTitle)} (image #${img.imageIndex})</option>`;
+                }).join('')}
+                <option value="custom">Custom image URL...</option>
+              </select>
+              <input type="text" id="customImageUrl" placeholder="Paste image URL..." style="display:none;margin-top:0.3rem">
+            </div>
+            <div class="field">
+              <label>Schedule (optional)</label>
+              <input type="datetime-local" id="scheduleTime">
+            </div>
+          </div>
+          <div style="margin-top:0.8rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+            <button class="publish-btn" onclick="previewPublish()">Preview in Meta Business Suite</button>
+            <button class="secondary" onclick="directPublish()">Publish Now</button>
+          </div>
+          <div id="publishResult"></div>
+        </div>`;
+
+      // Store current post data for publishing
+      window._currentPost = { post, data };
+
       output.innerHTML = html;
     }
 
@@ -725,7 +847,177 @@
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
+    // ─── Publishing Functions ────────────────────────
+
+    async function checkPublishSession() {
+      try {
+        const res = await fetch('/api/posts/session');
+        const session = await res.json();
+        const el = document.getElementById('sessionStatus');
+        if (session.valid) {
+          el.textContent = 'Meta: connected';
+          el.className = 'session-status valid';
+        } else {
+          el.textContent = 'Meta: not logged in';
+          el.className = 'session-status invalid';
+          el.style.cursor = 'pointer';
+          el.title = 'Click to login to Meta Business Suite';
+          el.onclick = initMetaSession;
+        }
+      } catch {
+        const el = document.getElementById('sessionStatus');
+        el.textContent = 'Meta: unavailable';
+        el.className = 'session-status invalid';
+      }
+    }
+
+    async function initMetaSession() {
+      const el = document.getElementById('sessionStatus');
+      el.textContent = 'Meta: opening browser...';
+      el.className = 'session-status invalid';
+
+      try {
+        const res = await fetch('/api/posts/session/init', { method: 'POST' });
+        const result = await res.json();
+        if (result.success) {
+          el.textContent = 'Meta: connected';
+          el.className = 'session-status valid';
+          el.onclick = null;
+          el.style.cursor = '';
+        } else {
+          el.textContent = 'Meta: login failed';
+        }
+      } catch (e) {
+        el.textContent = 'Meta: error';
+      }
+    }
+
+    function toggleCustomImageUrl(el) {
+      const custom = document.getElementById('customImageUrl');
+      if (custom) custom.style.display = el.value === 'custom' ? '' : 'none';
+    }
+
+    function getPublishParams() {
+      if (!window._currentPost) return null;
+      const { post } = window._currentPost;
+
+      const imageSelect = document.getElementById('publishImageSelect');
+      let imageUrl = imageSelect?.value;
+      if (imageUrl === 'custom') {
+        imageUrl = document.getElementById('customImageUrl')?.value;
+      }
+
+      const scheduleEl = document.getElementById('scheduleTime');
+      const scheduleTime = scheduleEl?.value ? new Date(scheduleEl.value).toISOString() : null;
+
+      return {
+        caption: post.caption?.replace(/\\n/g, '\n') || '',
+        hashtags: post.hashtags || [],
+        imageUrl: imageUrl || '',
+        scheduleTime,
+      };
+    }
+
+    async function previewPublish() {
+      const params = getPublishParams();
+      if (!params) return;
+      if (!params.imageUrl) {
+        alert('Please select an image for the post.');
+        return;
+      }
+
+      const resultEl = document.getElementById('publishResult');
+      resultEl.innerHTML = '<div class="loading"><div class="spinner"></div>Opening Meta Business Suite for preview...</div>';
+
+      try {
+        const res = await fetch('/api/posts/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...params, confirm: false }),
+        });
+
+        const result = await res.json();
+
+        if (result.success && result.needsConfirmation) {
+          resultEl.innerHTML = `
+            <div class="publish-result success">
+              Preview ready! Review the screenshot below.
+              ${result.screenshotUrl ? `<img class="preview-image" src="${result.screenshotUrl}" alt="Post preview">` : ''}
+              <div style="margin-top:1rem">
+                <button class="confirm-btn" onclick="confirmPublish()">Confirm &amp; Publish</button>
+                <button class="secondary" onclick="document.getElementById('publishResult').innerHTML=''">Cancel</button>
+              </div>
+            </div>`;
+        } else if (result.needsLogin) {
+          resultEl.innerHTML = `
+            <div class="publish-result error">
+              Not logged in to Meta Business Suite.
+              <button class="secondary" onclick="initMetaSession()" style="margin-left:0.5rem">Login Now</button>
+            </div>`;
+        } else {
+          resultEl.innerHTML = `<div class="publish-result error">${escapeHtml(result.error || 'Preview failed')}</div>`;
+        }
+      } catch (e) {
+        resultEl.innerHTML = `<div class="publish-result error">${escapeHtml(e.message)}</div>`;
+      }
+    }
+
+    async function directPublish() {
+      if (!confirm('Publish this post to Instagram immediately?')) return;
+      await doPublish(true);
+    }
+
+    async function confirmPublish() {
+      await doPublish(true);
+    }
+
+    async function doPublish(confirmed) {
+      const params = getPublishParams();
+      if (!params) return;
+      if (!params.imageUrl) {
+        alert('Please select an image for the post.');
+        return;
+      }
+
+      const resultEl = document.getElementById('publishResult');
+      resultEl.innerHTML = '<div class="loading"><div class="spinner"></div>Publishing to Instagram...</div>';
+
+      try {
+        const res = await fetch('/api/posts/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...params, confirm: confirmed }),
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          resultEl.innerHTML = `
+            <div class="publish-result success">
+              ${escapeHtml(result.message)}
+              ${result.screenshotUrl ? `<img class="preview-image" src="${result.screenshotUrl}" alt="Published post">` : ''}
+            </div>`;
+          checkPublishSession(); // Refresh session status
+        } else if (result.needsLogin) {
+          resultEl.innerHTML = `
+            <div class="publish-result error">
+              Session expired.
+              <button class="secondary" onclick="initMetaSession()" style="margin-left:0.5rem">Re-login</button>
+            </div>`;
+        } else {
+          resultEl.innerHTML = `
+            <div class="publish-result error">
+              ${escapeHtml(result.error || 'Publishing failed')}
+              ${result.screenshotUrl ? `<img class="preview-image" src="${result.screenshotUrl}" alt="Error screenshot">` : ''}
+            </div>`;
+        }
+      } catch (e) {
+        resultEl.innerHTML = `<div class="publish-result error">${escapeHtml(e.message)}</div>`;
+      }
+    }
+
     init();
+    checkPublishSession();
   </script>
 </body>
 </html>

@@ -89,4 +89,72 @@ router.post('/rewrite', async (req, res) => {
   }
 });
 
+// ─── Publishing Routes ──────────────────────────────────
+
+const metaPublisher = require('../services/meta-publisher');
+
+// GET /api/posts/session — check Meta Business Suite session
+router.get('/session', (req, res) => {
+  const session = metaPublisher.checkSession();
+  res.json(session);
+});
+
+// POST /api/posts/session/init — open browser for manual Meta login
+router.post('/session/init', async (req, res) => {
+  try {
+    const result = await metaPublisher.initSession({ headless: false });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/posts/publish — publish or preview an Instagram post
+// Body: { caption, hashtags[], imagePath?, imageUrl?, scheduleTime?, confirm? }
+router.post('/publish', async (req, res) => {
+  try {
+    const {
+      caption,
+      hashtags = [],
+      imagePath,
+      imageUrl,
+      scheduleTime,
+      confirm = false,
+      headless = true,
+    } = req.body;
+
+    if (!caption) {
+      return res.status(400).json({ error: 'caption is required' });
+    }
+
+    if (!imagePath && !imageUrl) {
+      return res.status(400).json({ error: 'Either imagePath or imageUrl is required' });
+    }
+
+    const result = await metaPublisher.publishToInstagram({
+      caption,
+      hashtags,
+      imagePath,
+      imageUrl,
+      scheduleTime,
+      confirm,
+      headless,
+    });
+
+    // If there's a screenshot, convert path to serveable URL
+    if (result.screenshotPath) {
+      result.screenshotUrl = `/screenshots/${require('path').basename(result.screenshotPath)}`;
+    }
+    if (result.previewScreenshotPath) {
+      result.previewScreenshotUrl = `/screenshots/${require('path').basename(result.previewScreenshotPath)}`;
+    }
+
+    const statusCode = result.success ? 200 : (result.needsLogin ? 401 : 500);
+    res.status(statusCode).json(result);
+  } catch (err) {
+    console.error('Publish error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

@@ -1,12 +1,8 @@
 {
   "mcpServers": {
     "shopify-store": {
-      "command": "npx",
-      "args": ["-y", "shopify-mcp"],
-      "env": {
-        "SHOPIFY_ACCESS_TOKEN": "${SHOPIFY_ACCESS_TOKEN}",
-        "MYSHOPIFY_DOMAIN": "${SHOPIFY_STORE_DOMAIN}"
-      }
+      "command": "bash",
+      "args": ["/home/pmacmurchy/projects/shopify-mcp-fork/start.sh"]
     },
     "shopify-dev": {
       "command": "npx",
