@@ -17,3 +17,6 @@ node_modules/
 .env.local
 
 .playwright-mcp/
+
+# Working artifacts (screenshots, upload copies, session files)
+.tmp/
