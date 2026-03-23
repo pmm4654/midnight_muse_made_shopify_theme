@@ -6,26 +6,52 @@
   <meta name="color-scheme" content="dark" />
   <meta name="supported-color-schemes" content="dark" />
   <title>Your 15% vanishes in 4 days</title>
+  <style type="text/css">
+    @media only screen and (max-width: 620px) {
+      .email-container { width: 100% !important; }
+      .content-pad { padding-left: 20px !important; padding-right: 20px !important; }
+      .content-pad-sm { padding-left: 16px !important; padding-right: 16px !important; }
+      .header-pad { padding-left: 20px !important; padding-right: 20px !important; }
+      .hero-title { font-size: 22px !important; line-height: 30px !important; }
+      .discount-code { font-size: 26px !important; letter-spacing: 4px !important; }
+      .discount-value { font-size: 18px !important; }
+      .section-title { font-size: 17px !important; }
+      .cta-wrap { width: 100% !important; }
+      .cta-link { padding: 16px 32px !important; display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
+      .product-grid-row { display: block !important; }
+      .product-card { display: block !important; width: 100% !important; padding: 4px 0 !important; }
+      .step-num-cell { width: 42px !important; }
+    }
+  </style>
+  <!--[if mso]>
+  <style type="text/css">
+    .product-card { width: 33% !important; }
+  </style>
+  <![endif]-->
 </head>
 <body style="margin: 0; padding: 0; background-color: #0d0d1a; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
 
+  <!-- Preheader text -->
   <span style="display: none !important; visibility: hidden; mso-hide: all; font-size: 0; line-height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden;">
     Use your code before it's gone.
     &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
   </span>
 
+  <!-- Email wrapper -->
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0d0d1a;">
     <tr>
       <td align="center" style="padding: 20px 10px;">
 
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #1a1a2e; border: 1px solid #2d1b69; border-radius: 2px;">
+        <!-- Main container -->
+        <!--[if mso]><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" align="center"><tr><td><![endif]-->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-container" style="max-width: 600px; background-color: #1a1a2e; border: 1px solid #2d1b69; border-radius: 2px;">
 
           <!-- Header -->
           <tr>
             <td style="padding: 0;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td align="center" style="padding: 40px 40px 10px 40px;">
+                  <td align="center" class="header-pad" style="padding: 40px 40px 10px 40px;">
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                       <tr>
                         <td style="font-size: 18px; color: #d4a574; letter-spacing: 12px; font-family: Georgia, 'Times New Roman', serif;">&#10022; &#10022; &#10022;</td>
@@ -39,7 +65,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" style="padding: 0 40px 30px 40px;">
+                  <td align="center" class="header-pad" style="padding: 0 40px 30px 40px;">
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                       <tr>
                         <td style="border-bottom: 1px solid #d4a574; width: 60px;">&nbsp;</td>
@@ -71,7 +97,7 @@
             <td style="padding: 10px 40px 10px 40px;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 26px; line-height: 34px; color: #faf3e0; text-align: center; padding-bottom: 25px;">
+                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 26px; line-height: 34px; color: #faf3e0; text-align: center; padding-bottom: 25px; font-weight: bold;">
                     The Spell is Fading,<br />{{ customer.first_name | default: 'dark soul' }}
                   </td>
                 </tr>
@@ -92,9 +118,9 @@
                   <td style="padding: 20px 25px;">
                     <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #faf3e0;">Here's what 15% gets you:</span><br /><br />
                     <span style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 26px; color: #c8c0d8;">
-                      &#10022; <strong style="color: #faf3e0;">Spooky Wristlet Keychain</strong> &mdash; <span style="color: #8b7bb5; text-decoration: line-through;">$6</span> <strong style="color: #d4a574;">$5.10</strong><br />
-                      &#10022; <strong style="color: #faf3e0;">Gothic Heart Earrings</strong> &mdash; <span style="color: #8b7bb5; text-decoration: line-through;">$12</span> <strong style="color: #d4a574;">$10.20</strong><br />
-                      &#10022; <strong style="color: #faf3e0;">Dark Humor 20oz Tumbler</strong> &mdash; <span style="color: #8b7bb5; text-decoration: line-through;">$20</span> <strong style="color: #d4a574;">$17</strong><br /><br />
+                      &#10022; <a href="https://midnightmusemade.com/products/spooky-wristlet-keychain-goth-witchy?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="color: #faf3e0; text-decoration: underline;"><strong style="color: #faf3e0;">Spooky Wristlet Keychain</strong></a> &mdash; <span style="color: #8b7bb5; text-decoration: line-through;">$6</span> <strong style="color: #d4a574;">$5.10</strong><br />
+                      &#10022; <a href="https://midnightmusemade.com/products/personalized-spooky-earrings-goth-dangle?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="color: #faf3e0; text-decoration: underline;"><strong style="color: #faf3e0;">Gothic Heart Earrings</strong></a> &mdash; <span style="color: #8b7bb5; text-decoration: line-through;">$12</span> <strong style="color: #d4a574;">$10.20</strong><br />
+                      &#10022; <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="color: #faf3e0; text-decoration: underline;"><strong style="color: #faf3e0;">Dark Humor 20oz Tumbler</strong></a> &mdash; <span style="color: #8b7bb5; text-decoration: line-through;">$20</span> <strong style="color: #d4a574;">$17</strong><br /><br />
                     </span>
                     <span style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 22px; color: #8b7bb5;">Ready to ship. No customization needed. Just add to cart.</span>
                   </td>
@@ -109,7 +135,7 @@
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" style="background-color: #d4a574; border-radius: 2px;">
-                    <a href="https://midnightmusemade.com" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; color: #0d0d1a; text-decoration: none; font-weight: bold; letter-spacing: 1px;">
+                    <a href="https://midnightmusemade.com/discount/WELCOME15?utm_campaign=66b0df&amp;utm_source=discount_shareable_link" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; color: #0d0d1a; text-decoration: none; font-weight: bold; letter-spacing: 1px;">
                       Claim Your 15% Before the Witching Hour
                     </a>
                   </td>
@@ -118,9 +144,10 @@
             </td>
           </tr>
 
+
           <!-- Footer -->
           <tr>
-            <td style="background-color: #0d0d1a; padding: 30px 40px; border-top: 1px solid #2d1b69;">
+            <td class="content-pad" style="background-color: #0d0d1a; padding: 30px 40px; border-top: 1px solid #2d1b69;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td align="center" style="padding-bottom: 15px; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; font-style: italic; color: #d4a574;">
@@ -143,6 +170,9 @@
           </tr>
 
         </table>
+        <!-- End main container -->
+        <!--[if mso]></td></tr></table><![endif]-->
+
       </td>
     </tr>
   </table>

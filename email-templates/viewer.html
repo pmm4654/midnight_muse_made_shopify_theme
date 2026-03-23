@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Viewer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d0d1a; color: #faf3e0; font-family: 'Work Sans', Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+    .toolbar {
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 20px;
+      background: #1a1a2e; border-bottom: 1px solid #2d1b69;
+      flex-shrink: 0;
+    }
+    .toolbar a {
+      color: #8b7bb5; text-decoration: none; font-size: 13px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .toolbar a:hover { color: #d4a574; }
+    .toolbar .filename {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 15px; color: #faf3e0;
+      flex: 1;
+    }
+    .toolbar .viewport-toggle {
+      display: flex; gap: 4px;
+    }
+    .toolbar .viewport-toggle button {
+      padding: 6px 14px; border: 1px solid #2d1b69; border-radius: 2px;
+      background: transparent; color: #8b7bb5; font-size: 12px; cursor: pointer;
+      font-family: 'Work Sans', Arial, sans-serif;
+    }
+    .toolbar .viewport-toggle button.active {
+      background: #2d1b69; color: #d4a574; border-color: #d4a574;
+    }
+    .toolbar .viewport-toggle button:hover { border-color: #d4a574; color: #d4a574; }
+    .btn-copy {
+      padding: 8px 20px; border: none; border-radius: 2px;
+      background: #d4a574; color: #0d0d1a; font-weight: 600;
+      font-size: 13px; cursor: pointer; font-family: 'Work Sans', Arial, sans-serif;
+      transition: background 0.2s;
+    }
+    .btn-copy:hover { background: #c4955a; }
+    .btn-copy.copied { background: #4a9; }
+    .preview-area {
+      flex: 1; display: flex; justify-content: center;
+      padding: 20px; background: #12121f; overflow: auto;
+    }
+    .preview-area iframe {
+      border: 1px solid #2d1b69; background: #0d0d1a;
+      transition: width 0.3s ease;
+      height: 100%; min-height: 800px;
+    }
+    .source-panel {
+      display: none; flex: 1; overflow: auto; padding: 20px;
+      background: #12121f;
+    }
+    .source-panel pre {
+      background: #0d0d1a; border: 1px solid #2d1b69; border-radius: 2px;
+      padding: 20px; font-size: 12px; line-height: 1.6;
+      color: #c8c0d8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html">&larr; All Templates</a>
+    <span class="filename" id="filename"></span>
+    <div class="viewport-toggle">
+      <button data-width="375" title="Mobile">Mobile</button>
+      <button data-width="600" class="active" title="Desktop email width">Desktop</button>
+      <button data-width="100%" title="Full width">Full</button>
+    </div>
+    <button class="btn-copy" id="viewToggle" onclick="toggleSource()">View Source</button>
+    <button class="btn-copy" id="copyBtn" onclick="copyHTML()">Copy HTML</button>
+  </div>
+  <div class="preview-area" id="previewArea">
+    <iframe id="preview" width="600"></iframe>
+  </div>
+  <div class="source-panel" id="sourcePanel">
+    <pre><code id="sourceCode"></code></pre>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const file = params.get('file');
+    let rawHTML = '';
+    let showingSource = false;
+
+    if (file) {
+      document.getElementById('filename').textContent = file;
+      document.title = file + ' — Email Viewer';
+      document.getElementById('preview').src = file;
+
+      fetch('/raw/' + file)
+        .then(r => r.text())
+        .then(html => {
+          rawHTML = html;
+          document.getElementById('sourceCode').textContent = html;
+        });
+    }
+
+    // Viewport toggle
+    document.querySelectorAll('.viewport-toggle button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.viewport-toggle button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const w = btn.dataset.width;
+        document.getElementById('preview').style.width = w;
+      });
+    });
+
+    function toggleSource() {
+      showingSource = !showingSource;
+      document.getElementById('previewArea').style.display = showingSource ? 'none' : 'flex';
+      document.getElementById('sourcePanel').style.display = showingSource ? 'flex' : 'none';
+      document.getElementById('viewToggle').textContent = showingSource ? 'Preview' : 'View Source';
+    }
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return Promise.resolve();
+    }
+
+    function copyHTML() {
+      if (!rawHTML) return;
+      copyToClipboard(rawHTML).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy HTML'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

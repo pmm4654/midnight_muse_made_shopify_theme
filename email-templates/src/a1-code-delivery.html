@@ -1,106 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="supported-color-schemes" content="dark" />
-  <title>You didn't make the 13... but the coven still wants you</title>
-  <style type="text/css">
-    @media only screen and (max-width: 620px) {
-      .email-container { width: 100% !important; }
-      .content-pad { padding-left: 20px !important; padding-right: 20px !important; }
-      .content-pad-sm { padding-left: 16px !important; padding-right: 16px !important; }
-      .header-pad { padding-left: 20px !important; padding-right: 20px !important; }
-      .hero-title { font-size: 22px !important; line-height: 30px !important; }
-      .discount-code { font-size: 26px !important; letter-spacing: 4px !important; }
-      .discount-value { font-size: 18px !important; }
-      .section-title { font-size: 17px !important; }
-      .cta-wrap { width: 100% !important; }
-      .cta-link { padding: 16px 32px !important; display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
-      .product-grid-row { display: block !important; }
-      .product-card { display: block !important; width: 100% !important; padding: 4px 0 !important; }
-      .step-num-cell { width: 42px !important; }
-    }
-  </style>
-  <!--[if mso]>
-  <style type="text/css">
-    .product-card { width: 33% !important; }
-  </style>
-  <![endif]-->
-</head>
-<body style="margin: 0; padding: 0; background-color: #0d0d1a; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
-
-  <!-- Preheader text -->
-  <span style="display: none !important; visibility: hidden; mso-hide: all; font-size: 0; line-height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden;">
-    A welcome discount: 15% off your first order.
-    &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
-  </span>
-
-  <!-- Email wrapper -->
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0d0d1a;">
-    <tr>
-      <td align="center" style="padding: 20px 10px;">
-
-        <!-- Main container -->
-        <!--[if mso]><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" align="center"><tr><td><![endif]-->
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-container" style="max-width: 600px; background-color: #1a1a2e; border: 1px solid #2d1b69; border-radius: 2px;">
-
-          <!-- Header -->
-          <tr>
-            <td style="padding: 0;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr>
-                  <td align="center" class="header-pad" style="padding: 40px 40px 10px 40px;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="font-size: 18px; color: #d4a574; letter-spacing: 12px; font-family: Georgia, 'Times New Roman', serif;">&#10022; &#10022; &#10022;</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="padding: 10px 40px 5px 40px; font-family: Georgia, 'Times New Roman', serif; font-size: 11px; text-transform: uppercase; letter-spacing: 6px; color: #d4a574;">
-                    Midnight Muse Made
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" class="header-pad" style="padding: 0 40px 30px 40px;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="border-bottom: 1px solid #d4a574; width: 60px;">&nbsp;</td>
-                        <td style="padding: 0 12px; font-size: 8px; color: #d4a574;">&#9790;</td>
-                        <td style="border-bottom: 1px solid #d4a574; width: 60px;">&nbsp;</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
+---
+title: Your 50% discount code awaits, dark soul
+preheader: You were one of the chosen 13. Claim what's yours.
+---
           <!-- Body content -->
           <tr>
             <td class="content-pad" style="padding: 30px 40px 10px 40px;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 26px; line-height: 34px; color: #faf3e0; text-align: center; padding-bottom: 25px;">
-                    You Missed the 13...<br />But Not the Magic
+                  <td class="hero-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 26px; line-height: 34px; color: #faf3e0; text-align: center; padding-bottom: 25px;">
+                    You Were Chosen,<br />{{ customer.first_name | default: 'dark soul' }}.
                   </td>
                 </tr>
                 <tr>
                   <td style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 26px; color: #c8c0d8; text-align: center; padding-bottom: 20px;">
-                    {{ customer.first_name | default: 'dark soul' }}, we'll be honest&mdash;13 souls arrived before you, and they claimed an enchantment we could only offer to a chosen few.
+                    You were one of the first <strong style="color: #d4a574;">13 souls</strong> to find us. That means something around here.
                   </td>
                 </tr>
                 <tr>
-                  <td style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 26px; color: #c8c0d8; text-align: center; padding-bottom: 20px;">
-                    But the coven doesn't turn anyone away at the door. You found us, and that matters.
-                  </td>
-                </tr>
-                <tr>
-                  <td style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 26px; color: #c8c0d8; text-align: center; padding-bottom: 10px;">
-                    So here's our welcome gift to you:
+                  <td style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 26px; color: #c8c0d8; text-align: center; padding-bottom: 25px;">
+                    Your discount code may have wandered into the shadow realm (or your spam folder). Either way, we're delivering it again&mdash;by candlelight.
                   </td>
                 </tr>
               </table>
@@ -113,17 +31,22 @@
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0d0d1a; border: 2px dashed #d4a574; border-radius: 2px;">
                 <tr>
                   <td align="center" style="padding: 25px 20px 8px 20px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 3px; color: #8b7bb5;">
-                    Your Welcome Discount
+                    Your Discount Code
                   </td>
                 </tr>
                 <tr>
                   <td align="center" class="discount-code" style="padding: 5px 20px; font-family: Georgia, 'Times New Roman', serif; font-size: 36px; font-weight: bold; letter-spacing: 6px; color: #d4a574;">
-                    WELCOME15
+                    FIRST13
                   </td>
                 </tr>
                 <tr>
                   <td align="center" class="discount-value" style="padding: 8px 20px 25px 20px; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; color: #faf3e0;">
-                    15% Off Your First Order
+                    50% Off Your Entire Order
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding: 0 20px 20px 20px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #8b7bb5;">
+                    $15 minimum purchase
                   </td>
                 </tr>
               </table>
@@ -191,8 +114,8 @@
                     </table>
                   </td>
                   <td valign="top" style="padding-bottom: 18px; padding-left: 12px;">
-                    <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #faf3e0;">Enter WELCOME15 at checkout</span><br />
-                    <span style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #8b7bb5;">Watch 15% vanish from your total like magic</span>
+                    <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #faf3e0;">Enter FIRST13 at checkout</span><br />
+                    <span style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #8b7bb5;">Watch 50% vanish from your total like magic</span>
                   </td>
                 </tr>
                 <!-- Step 4 -->
@@ -221,7 +144,7 @@
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="cta-wrap">
                 <tr>
                   <td align="center" style="background-color: #d4a574; border-radius: 2px;">
-                    <a href="https://midnightmusemade.com/discount/WELCOME15?utm_campaign=66b0df&amp;utm_source=discount_shareable_link" target="_blank" class="cta-link" style="display: inline-block; padding: 16px 40px; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #0d0d1a; text-decoration: none; font-weight: bold; letter-spacing: 1px;">
+                    <a href="https://midnightmusemade.com/discount/FIRST13?utm_campaign=66b0df&amp;utm_source=discount_shareable_link" target="_blank" class="cta-link" style="display: inline-block; padding: 16px 40px; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #0d0d1a; text-decoration: none; font-weight: bold; letter-spacing: 1px;">
                       Claim Your Reward
                     </a>
                   </td>
@@ -236,7 +159,7 @@
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td align="center" class="section-title" style="padding-bottom: 18px; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; color: #faf3e0;">
-                    See What 15% Off Looks Like
+                    See What 50% Off Looks Like
                   </td>
                 </tr>
               </table>
@@ -251,25 +174,25 @@
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0d0d1a; border-radius: 2px;">
                         <tr>
                           <td align="center" style="padding: 8px 8px 0 8px;">
-                            <a href="https://midnightmusemade.com/collections/all?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none;"><img src="https://cdn.shopify.com/s/files/1/0984/3464/6308/files/IMG_2461.jpg?v=1770580961" alt="Gothic Moon Window Cling" width="140" style="width: 100%; max-width: 140px; height: auto; display: block; border-radius: 2px;" /></a>
+                            <a href="https://midnightmusemade.com/collections/all?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none;"><img src="https://cdn.shopify.com/s/files/1/0984/3464/6308/files/IMG_2461.jpg?v=1770580961" alt="Gothic Moon Window Cling" width="140" style="width: 100%; max-width: 140px; height: auto; display: block; border-radius: 2px;" /></a>
                           </td>
                         </tr>
                         <tr>
                           <td align="center" style="padding: 10px 8px 6px 8px; font-family: Georgia, 'Times New Roman', serif; font-size: 13px; color: #faf3e0; height: 44px; vertical-align: middle;">
-                            <a href="https://midnightmusemade.com/collections/all?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="color: #faf3e0; text-decoration: none;">Gothic Moon Window Cling</a>
+                            <a href="https://midnightmusemade.com/collections/all?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="color: #faf3e0; text-decoration: none;">Gothic Moon Window Cling</a>
                           </td>
                         </tr>
                         <tr>
                           <td align="center" style="padding: 0 8px 4px 8px;">
-                            <a href="https://midnightmusemade.com/collections/all?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none; color: inherit;">
+                            <a href="https://midnightmusemade.com/collections/all?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none; color: inherit;">
                             <span style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #8b7bb5; text-decoration: line-through;">$6</span>
-                            <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; color: #d4a574; font-weight: bold;">&nbsp;$5</span>
+                            <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; color: #d4a574; font-weight: bold;">&nbsp;$3</span>
                             </a>
                           </td>
                         </tr>
                         <tr>
                           <td align="center" style="padding: 0 8px 12px 8px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #8b7bb5;">
-                            <a href="https://midnightmusemade.com/collections/all?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none; color: #8b7bb5;">Spooky window decor</a>
+                            <a href="https://midnightmusemade.com/collections/all?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none; color: #8b7bb5;">Spooky window decor</a>
                           </td>
                         </tr>
                       </table>
@@ -285,59 +208,59 @@
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0d0d1a; border-radius: 2px;">
                         <tr>
                           <td align="center" style="padding: 8px 8px 0 8px;">
-                            <a href="https://midnightmusemade.com/products/handmade-acrylic-dangle-earrings?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none;"><img src="https://cdn.shopify.com/s/files/1/0984/3464/6308/files/1ae8c545-il_fullxfull.7482435283_mh3w.jpg?v=1769382587" alt="Dangle Earrings" width="140" style="width: 100%; max-width: 140px; height: auto; display: block; border-radius: 2px;" /></a>
+                            <a href="https://midnightmusemade.com/products/handmade-acrylic-dangle-earrings?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none;"><img src="https://cdn.shopify.com/s/files/1/0984/3464/6308/files/1ae8c545-il_fullxfull.7482435283_mh3w.jpg?v=1769382587" alt="Dangle Earrings" width="140" style="width: 100%; max-width: 140px; height: auto; display: block; border-radius: 2px;" /></a>
                           </td>
                         </tr>
                         <tr>
                           <td align="center" style="padding: 10px 8px 6px 8px; font-family: Georgia, 'Times New Roman', serif; font-size: 13px; color: #faf3e0; height: 44px; vertical-align: middle;">
-                            <a href="https://midnightmusemade.com/products/handmade-acrylic-dangle-earrings?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="color: #faf3e0; text-decoration: none;">Dangle Earrings</a>
+                            <a href="https://midnightmusemade.com/products/handmade-acrylic-dangle-earrings?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="color: #faf3e0; text-decoration: none;">Dangle Earrings</a>
                           </td>
                         </tr>
                         <tr>
                           <td align="center" style="padding: 0 8px 4px 8px;">
-                            <a href="https://midnightmusemade.com/products/handmade-acrylic-dangle-earrings?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none; color: inherit;">
+                            <a href="https://midnightmusemade.com/products/handmade-acrylic-dangle-earrings?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none; color: inherit;">
                             <span style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #8b7bb5; text-decoration: line-through;">$12</span>
+                            <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; color: #d4a574; font-weight: bold;">&nbsp;$6</span>
+                            </a>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center" style="padding: 0 8px 12px 8px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #8b7bb5;">
+                            <a href="https://midnightmusemade.com/products/handmade-acrylic-dangle-earrings?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none; color: #8b7bb5;">Statement jewelry</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <!--[if mso]></td><td width="33%" valign="top"><![endif]-->
+              <div class="product-card" style="display: inline-block; width: 32%; vertical-align: top;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 8px;">
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0d0d1a; border-radius: 2px;">
+                        <tr>
+                          <td align="center" style="padding: 8px 8px 0 8px;">
+                            <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none;"><img src="https://cdn.shopify.com/s/files/1/0984/3464/6308/files/IMG_2834.jpg?v=1770056485" alt="Dark Humor Tumbler" width="140" style="width: 100%; max-width: 140px; height: auto; display: block; border-radius: 2px;" /></a>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center" style="padding: 10px 8px 6px 8px; font-family: Georgia, 'Times New Roman', serif; font-size: 13px; color: #faf3e0; height: 44px; vertical-align: middle;">
+                            <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="color: #faf3e0; text-decoration: none;">Dark Humor Tumbler</a>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center" style="padding: 0 8px 4px 8px;">
+                            <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none; color: inherit;">
+                            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #8b7bb5; text-decoration: line-through;">$20</span>
                             <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; color: #d4a574; font-weight: bold;">&nbsp;$10</span>
                             </a>
                           </td>
                         </tr>
                         <tr>
                           <td align="center" style="padding: 0 8px 12px 8px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #8b7bb5;">
-                            <a href="https://midnightmusemade.com/products/handmade-acrylic-dangle-earrings?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none; color: #8b7bb5;">Statement jewelry</a>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-              <!--[if mso]></td><td width="33%" valign="top"><![endif]-->
-              <div class="product-card" style="display: inline-block; width: 32%; vertical-align: top;">
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-                  <tr>
-                    <td style="padding: 8px;">
-                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #0d0d1a; border-radius: 2px;">
-                        <tr>
-                          <td align="center" style="padding: 8px 8px 0 8px;">
-                            <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none;"><img src="https://cdn.shopify.com/s/files/1/0984/3464/6308/files/IMG_2834.jpg?v=1770056485" alt="Dark Humor Tumbler" width="140" style="width: 100%; max-width: 140px; height: auto; display: block; border-radius: 2px;" /></a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="center" style="padding: 10px 8px 6px 8px; font-family: Georgia, 'Times New Roman', serif; font-size: 13px; color: #faf3e0; height: 44px; vertical-align: middle;">
-                            <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="color: #faf3e0; text-decoration: none;">Dark Humor Tumbler</a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="center" style="padding: 0 8px 4px 8px;">
-                            <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none; color: inherit;">
-                            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #8b7bb5; text-decoration: line-through;">$20</span>
-                            <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; color: #d4a574; font-weight: bold;">&nbsp;$17</span>
-                            </a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="center" style="padding: 0 8px 12px 8px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #8b7bb5;">
-                            <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-b" target="_blank" style="text-decoration: none; color: #8b7bb5;">Sarcastic skeleton design</a>
+                            <a href="https://midnightmusemade.com/products/witchy-stainless-steel-tumbler-20oz?utm_source=email&amp;utm_medium=campaign&amp;utm_campaign=series-a" target="_blank" style="text-decoration: none; color: #8b7bb5;">Sarcastic skeleton design</a>
                           </td>
                         </tr>
                       </table>
@@ -362,40 +285,3 @@
               </table>
             </td>
           </tr>
-
-
-          <!-- Footer -->
-          <tr>
-            <td class="content-pad" style="background-color: #0d0d1a; padding: 30px 40px; border-top: 1px solid #2d1b69;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-                <tr>
-                  <td align="center" style="padding-bottom: 15px; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; font-style: italic; color: #d4a574;">
-                    Stay strange. Stay spooky.
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="padding-bottom: 15px; font-family: Georgia, 'Times New Roman', serif; font-size: 11px; text-transform: uppercase; letter-spacing: 4px; color: #6b6b8a;">
-                    Midnight Muse Made
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #4a4a6a;">
-                    You're receiving this because you joined the coven.<br />
-                    {{ unsubscribe_link }} if you must&mdash;we'll miss you.
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-        </table>
-        <!-- End main container -->
-        <!--[if mso]></td></tr></table><![endif]-->
-
-      </td>
-    </tr>
-  </table>
-
-{{ open_tracking_block }}
-</body>
-</html>

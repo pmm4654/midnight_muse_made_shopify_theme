@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Templates - Midnight Muse Made</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d0d1a; color: #faf3e0; font-family: 'Work Sans', Arial, sans-serif; padding: 40px 20px; }
+    h1 { font-family: Georgia, 'Times New Roman', serif; text-align: center; margin-bottom: 8px; color: #d4a574; font-size: 28px; }
+    .subtitle { text-align: center; color: #8b7bb5; margin-bottom: 40px; font-size: 14px; }
+    .grid { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .card { background: #1a1a2e; border: 1px solid #2d1b69; border-radius: 4px; padding: 24px; transition: border-color 0.2s; }
+    .card:hover { border-color: #d4a574; }
+    .card h2 { font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #faf3e0; margin-bottom: 8px; }
+    .card .series { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #d4a574; margin-bottom: 12px; }
+    .card .desc { font-size: 13px; color: #8b7bb5; line-height: 1.5; margin-bottom: 16px; }
+    .card .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .card a, .card button { display: inline-block; padding: 10px 20px; background: #d4a574; color: #0d0d1a; text-decoration: none; font-weight: 600; font-size: 13px; border-radius: 2px; border: none; cursor: pointer; font-family: inherit; }
+    .card a:hover, .card button:hover { background: #c4955a; }
+    .card a.btn-secondary { background: transparent; border: 1px solid #2d1b69; color: #8b7bb5; }
+    .card a.btn-secondary:hover { border-color: #d4a574; color: #d4a574; }
+    .card button.copied { background: #4a9; }
+    .footer { text-align: center; margin-top: 40px; color: #4a4a6a; font-size: 12px; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>Email Templates</h1>
+  <p class="subtitle">Midnight Muse Made &mdash; Campaign Preview</p>
+  <div class="grid">
+    <div class="card">
+      <div class="series">Series A &bull; Email 1</div>
+      <h2>Code Delivery</h2>
+      <p class="desc">Your 50% enchantment awaits, dark soul. First-13 discount code delivery.</p>
+      <div class="actions">
+        <a href="viewer.html?file=a1-code-delivery.html">View</a>
+        <button onclick="copyHTML('a1-code-delivery.html', this)">Copy HTML</button>
+        <a href="a1-code-delivery.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series A &bull; Email 2</div>
+      <h2>Process Reveal</h2>
+      <p class="desc">Behind-the-scenes look at how the magic is made.</p>
+      <div class="actions">
+        <a href="viewer.html?file=a2-process-reveal.html">View</a>
+        <button onclick="copyHTML('a2-process-reveal.html', this)">Copy HTML</button>
+        <a href="a2-process-reveal.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series A &bull; Email 3</div>
+      <h2>Urgency</h2>
+      <p class="desc">Time-sensitive reminder to use the enchantment code.</p>
+      <div class="actions">
+        <a href="viewer.html?file=a3-urgency.html">View</a>
+        <button onclick="copyHTML('a3-urgency.html', this)">Copy HTML</button>
+        <a href="a3-urgency.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series A &bull; Email 4</div>
+      <h2>Final Night</h2>
+      <p class="desc">Last chance — the enchantment expires at midnight.</p>
+      <div class="actions">
+        <a href="viewer.html?file=a4-final-night.html">View</a>
+        <button onclick="copyHTML('a4-final-night.html', this)">Copy HTML</button>
+        <a href="a4-final-night.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series B &bull; Email 1</div>
+      <h2>Welcome</h2>
+      <p class="desc">Welcome to the coven — new subscriber greeting.</p>
+      <div class="actions">
+        <a href="viewer.html?file=b1-welcome.html">View</a>
+        <button onclick="copyHTML('b1-welcome.html', this)">Copy HTML</button>
+        <a href="b1-welcome.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series B &bull; Email 2</div>
+      <h2>Product Showcase</h2>
+      <p class="desc">Curated dark treasures spotlight.</p>
+      <div class="actions">
+        <a href="viewer.html?file=b2-product-showcase.html">View</a>
+        <button onclick="copyHTML('b2-product-showcase.html', this)">Copy HTML</button>
+        <a href="b2-product-showcase.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series B &bull; Email 3</div>
+      <h2>Expiration Warning</h2>
+      <p class="desc">Your welcome offer is fading into the shadows.</p>
+      <div class="actions">
+        <a href="viewer.html?file=b3-expiration-warning.html">View</a>
+        <button onclick="copyHTML('b3-expiration-warning.html', this)">Copy HTML</button>
+        <a href="b3-expiration-warning.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series B &bull; Email 4</div>
+      <h2>Last Call</h2>
+      <p class="desc">Final reminder before the welcome offer vanishes.</p>
+      <div class="actions">
+        <a href="viewer.html?file=b4-last-call.html">View</a>
+        <button onclick="copyHTML('b4-last-call.html', this)">Copy HTML</button>
+        <a href="b4-last-call.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series C &bull; Email 1</div>
+      <h2>Coven Letter</h2>
+      <p class="desc">Personal letter from the coven — loyalty nurture.</p>
+      <div class="actions">
+        <a href="viewer.html?file=c1-coven-letter.html">View</a>
+        <button onclick="copyHTML('c1-coven-letter.html', this)">Copy HTML</button>
+        <a href="c1-coven-letter.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series C &bull; Email 2</div>
+      <h2>Loyalty Reward</h2>
+      <p class="desc">Exclusive reward for loyal coven members.</p>
+      <div class="actions">
+        <a href="viewer.html?file=c2-loyalty-reward.html">View</a>
+        <button onclick="copyHTML('c2-loyalty-reward.html', this)">Copy HTML</button>
+        <a href="c2-loyalty-reward.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series C &bull; Email 3</div>
+      <h2>Social Proof</h2>
+      <p class="desc">See what fellow coven members are loving.</p>
+      <div class="actions">
+        <a href="viewer.html?file=c3-social-proof.html">View</a>
+        <button onclick="copyHTML('c3-social-proof.html', this)">Copy HTML</button>
+        <a href="c3-social-proof.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="series">Series C &bull; Email 4</div>
+      <h2>Code Expiration</h2>
+      <p class="desc">Your loyalty code is about to expire.</p>
+      <div class="actions">
+        <a href="viewer.html?file=c4-code-expiration.html">View</a>
+        <button onclick="copyHTML('c4-code-expiration.html', this)">Copy HTML</button>
+        <a href="c4-code-expiration.html" class="btn-secondary">Raw</a>
+      </div>
+    </div>
+  </div>
+  <p class="footer">Stay strange. Stay spooky.</p>
+  <script>
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return Promise.resolve();
+    }
+
+    function copyHTML(file, btn) {
+      fetch('/raw/' + file)
+        .then(r => r.text())
+        .then(html => {
+          copyToClipboard(html).then(() => {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = 'Copy HTML'; btn.classList.remove('copied'); }, 2000);
+          });
+        });
+    }
+  </script>
+</body>
+</html>
