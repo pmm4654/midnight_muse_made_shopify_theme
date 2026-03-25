@@ -283,6 +283,234 @@ Per the CLAUDE.md notes: Shopify Email templates have **no API** — they must b
 
 ---
 
+## Part 7: Offline Optimization Deep Dive — Approaches, Differences & Tradeoffs
+
+The fundamental tension: **online testing gives you real signal but is slow and sample-constrained; offline testing is fast and unlimited but uses proxy metrics that may not perfectly predict real-world performance.** The art is in combining them.
+
+### Approach 1: Heuristic / Rule-Based Scoring
+
+**How it works:** A script mechanically scores each email variant against hard rules — no AI judgment involved.
+
+**Example evaluation script:**
+```bash
+# Each check prints METRIC name=value
+# Subject line length (40-60 chars optimal)
+# Flesch reading ease score (target: 60-70 for marketing)
+# Spam word count (fewer = better)
+# CTA count (exactly 1 primary CTA = best)
+# Personalization token count ({{first_name}}, etc.)
+# Preview text present (yes/no)
+# Image-to-text ratio
+# Unsubscribe link present (compliance)
+```
+
+**What the autoresearch loop does:** Agent modifies the email template → script scores it → keep if total score improves → revert if not → repeat.
+
+**Strengths:**
+- Completely deterministic — same input always gives same score
+- Runs in milliseconds — can do 500+ iterations overnight
+- No API costs beyond Claude Code itself
+- Easy to debug (you can see exactly why a score changed)
+- Great for enforcing compliance and structural best practices
+
+**Weaknesses:**
+- Can only catch what you explicitly code for
+- Optimizes for form, not substance — a perfectly-structured boring email scores high
+- Can't evaluate persuasiveness, emotional resonance, or creativity
+- Agent will game the rules (e.g., stuffing personalization tokens into awkward places to boost that sub-score)
+
+**Best for:** Establishing a structurally sound baseline. Use as a "guard" metric (must pass) rather than the primary optimization target.
+
+---
+
+### Approach 2: LLM-as-Judge Evaluation
+
+**How it works:** A separate LLM call (or the same agent wearing an "evaluator hat") scores the email against a rubric. The rubric defines what good looks like across multiple dimensions.
+
+**Example rubric (scored 1-10 per dimension):**
+```markdown
+## Email Evaluation Rubric
+- **Subject Line Appeal:** Would this make you open the email? (curiosity, urgency, relevance)
+- **Value Proposition Clarity:** Is the benefit to the reader obvious within 3 seconds?
+- **Brand Voice Consistency:** Does this sound like [your brand]? (refer to tone guide)
+- **CTA Strength:** Is the call-to-action clear, specific, and compelling?
+- **Personalization Quality:** Does it feel written for one person, not a list?
+- **Scannability:** Can a reader get the gist by skimming headings and bold text?
+- **Emotional Hook:** Does it connect to a desire, fear, or aspiration?
+- **Unsubscribe Risk:** Would this annoy someone enough to unsubscribe? (inverse score)
+```
+
+**What the autoresearch loop does:** Agent modifies email → calls evaluator LLM with rubric → gets composite score → keep/revert → repeat.
+
+**Strengths:**
+- Can evaluate subjective quality (persuasiveness, tone, creativity)
+- Flexible — change the rubric and you change what gets optimized
+- Can simulate different audience perspectives ("Score this as a first-time visitor" vs. "Score this as a loyal repeat buyer")
+- Catches subtle issues rules miss (awkward phrasing, unclear value prop)
+
+**Weaknesses:**
+- **Non-deterministic** — same email can score differently on repeated evaluations (mitigate by averaging 3-5 runs)
+- **Self-reinforcing bias** — if the same model writes AND judges, it tends to prefer its own style. Scores drift toward "what Claude thinks is good" rather than "what your customers respond to"
+- **Rubric sensitivity** — small wording changes in the rubric produce big score swings. Requires careful calibration.
+- **API cost** — each evaluation is a full LLM call. At 100 iterations with 5 eval runs each = 500 API calls per night.
+- **Proxy gap** — an LLM's judgment of "would this make you click?" has imperfect correlation with actual human CTR
+
+**Best for:** Optimizing copy quality, tone, persuasiveness. The primary optimization metric for most email autoresearch loops.
+
+**Mitigation strategies:**
+- Use a different model for evaluation than for generation (e.g., generate with Claude, evaluate with GPT-4, or vice versa)
+- Calibrate the rubric against historical data: score your 10 best and 10 worst past campaigns, verify the rubric ranks them correctly
+- Add a "surprise" dimension to fight homogenization ("Does this contain at least one unexpected element?")
+
+---
+
+### Approach 3: Synthetic Audience Simulation
+
+**How it works:** The LLM role-plays as different customer personas and "reacts" to each email variant. You create 10-20 synthetic personas based on your actual customer segments, then measure simulated engagement across the panel.
+
+**Example personas:**
+```markdown
+Persona 1: Sarah, 28, first-time buyer, found you through Instagram, price-sensitive
+Persona 2: Marcus, 45, repeat customer (6 orders), buys gifts, not price-sensitive
+Persona 3: Jen, 33, subscribed 3 months ago, never purchased, browses weekly
+Persona 4: Alex, 22, signed up for the discount, might unsubscribe soon
+...
+```
+
+**For each persona, the evaluator answers:**
+- Would this person open this email? (0 or 1)
+- Would they click the CTA? (0 or 1)
+- Would they unsubscribe? (0 or 1)
+- Confidence level (1-5)
+
+**Aggregate across all personas → simulated open rate, CTR, unsubscribe rate.**
+
+**What the autoresearch loop does:** Agent modifies email → runs it past the persona panel → computes simulated metrics → keep/revert → repeat.
+
+**Strengths:**
+- Produces metrics in the same format as real campaign data (rates, percentages)
+- Forces the optimization to consider diverse audience segments, not just the "average" reader
+- Can surface tradeoffs (variant A is great for new subscribers but alienates loyalists)
+- Catches "unsubscribe bombs" — variants that optimize CTR by being aggressive but drive churn
+
+**Weaknesses:**
+- **Personas are fictional** — they're the model's guess at how these people behave, not actual behavior data
+- **Compounding hallucination** — model generates email, model role-plays personas, model aggregates results. Each layer adds uncertainty.
+- **Expensive** — 20 personas x 5 questions x 100 iterations = 10,000 LLM calls per night
+- **Calibration is hard** — how do you know your synthetic Sarah behaves like real Sarahs? You don't, unless you validate against historical data.
+- **Convergence issues** — the agent may find emails that "trick" the personas rather than genuinely engaging humans
+
+**Best for:** Catching segment-specific issues and preventing optimization for one group at the expense of others. Best used as a secondary check, not the primary metric.
+
+---
+
+### Approach 4: Historical Pattern Matching / Embedding Similarity
+
+**How it works:** Embed your top-performing historical emails and your worst-performing ones into a vector space. Score new variants by their similarity to winners and distance from losers.
+
+**Setup:**
+1. Take your 20 highest-CTR campaigns and 20 lowest-CTR campaigns
+2. Embed each using an embedding model
+3. For each new email variant, compute: `score = avg_similarity(variant, winners) - avg_similarity(variant, losers)`
+
+**What the autoresearch loop does:** Agent modifies email → embed it → compute similarity score → keep/revert → repeat.
+
+**Strengths:**
+- **Grounded in actual performance data** — the only approach that directly connects to what real humans did
+- Deterministic (same email always gets same embedding score)
+- Fast and cheap (embedding calls are ~100x cheaper than generation calls)
+- Naturally encodes patterns you haven't explicitly identified (maybe your winners all have a certain rhythm or vocabulary the embeddings capture)
+
+**Weaknesses:**
+- **Regression to the mean** — optimizes toward "more like past winners," which means the agent converges on a blend of your existing style rather than discovering something new
+- **Requires sufficient history** — needs 20+ campaigns with clear performance differentiation to work
+- **Can't explain itself** — you know the score but not why
+- **Doesn't generalize** — if your audience or product mix changes, historical patterns may not apply
+- **Novelty penalty** — a genuinely creative, high-potential email that's unlike anything you've sent before would score low
+
+**Best for:** Guardrail/sanity check. "Is this new variant at least in the neighborhood of what's worked before?" Use as a floor, not a ceiling.
+
+---
+
+### Approach 5: Composite / Ensemble Scoring (Recommended)
+
+**How it works:** Combine multiple approaches with weighted scoring.
+
+**Recommended composite for email autoresearch:**
+
+```
+TOTAL_SCORE = (
+    0.15 × heuristic_score        # Structural quality floor
+  + 0.45 × llm_judge_score        # Primary quality signal
+  + 0.25 × persona_panel_score    # Segment diversity check
+  + 0.15 × historical_similarity  # Grounding in real data
+)
+
+GUARD: heuristic_score >= 7/10        # Must pass structural checks
+GUARD: persona_unsubscribe_rate < 5%  # Must not alienate segments
+```
+
+**Strengths:**
+- No single failure mode dominates
+- Heuristics catch structural issues, LLM catches quality issues, personas catch segment issues, history catches drift
+- Guards prevent the agent from gaming any single dimension
+
+**Weaknesses:**
+- More complex to set up and calibrate
+- Weight tuning is its own optimization problem (meta-autoresearch?)
+- Slower per iteration (multiple eval calls)
+
+---
+
+### Tradeoff Summary Table
+
+| Approach | Speed | Cost | Accuracy (proxy→real) | Novelty Discovery | Setup Effort |
+|---|---|---|---|---|---|
+| Heuristic/Rules | Fastest (ms) | Free | Low (structural only) | None | Medium |
+| LLM-as-Judge | Medium (~5s) | Medium ($) | Medium-High | High | Low |
+| Synthetic Personas | Slow (~30s) | High ($$) | Medium | Medium | High |
+| Historical Embedding | Fast (~1s) | Low | Medium (past-biased) | None (penalizes novelty) | Medium |
+| **Composite (recommended)** | **Medium (~15s)** | **Medium ($)** | **Highest** | **Medium-High** | **High** |
+
+### Iterations Per Night (8 hours, single loop)
+
+| Approach | Time Per Iteration | Iterations/Night |
+|---|---|---|
+| Heuristic only | ~2 seconds | ~14,000 |
+| LLM-as-Judge (3 evals) | ~20 seconds | ~1,400 |
+| Full composite | ~45 seconds | ~640 |
+| Composite + 3 retries on close calls | ~90 seconds | ~320 |
+
+Even the slowest approach gives you **320 experiments overnight** — 10x what most marketing teams run in a year.
+
+---
+
+### The Proxy Gap: The Central Tradeoff
+
+All offline approaches share one fundamental limitation: **they optimize for a proxy of real human behavior, not actual human behavior.**
+
+```
+Proxy fidelity spectrum:
+
+Heuristics ──── Embeddings ──── LLM Judge ──── Synthetic Personas ──── Real A/B Test
+   Low                                                                     High
+   (structural)    (pattern)      (quality)      (simulated behavior)     (actual behavior)
+
+   Fast ───────────────────────────────────────────────────────────────── Slow
+   Free ───────────────────────────────────────────────────────────────── Expensive (in time)
+```
+
+**The recommended workflow is a funnel:**
+
+1. **Offline autoresearch** (overnight): Generate and evaluate 300+ variants → surface top 5
+2. **Human review** (10 minutes): Pick the best 2 from the top 5
+3. **Online A/B test** (days/weeks): Test the 2 finalists with real subscribers
+4. **Feed results back** into historical data → improve the offline scoring calibration
+
+This gives you the speed of offline optimization with the accuracy of online testing. The offline loop doesn't replace A/B testing — it dramatically narrows the search space so your limited online testing budget is spent on already-strong candidates rather than random guesses.
+
+---
+
 ## Sources
 
 - [karpathy/autoresearch (GitHub)](https://github.com/karpathy/autoresearch)
